@@ -1,0 +1,174 @@
+<html>
+  <head>
+
+    <script async
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAjnjte7sQ7iJC9uZK9IyR2QkOj7VH48h4&libraries=places&callback=initAutocomplete">
+    </script>
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <link rel="stylesheet" href="https://beagence.com/wp-content/themes/mthemes/assets/css/page-1-st.css">
+  </head>
+  <body>
+    <div id="trainD"></div>
+    <div id="rooting-container" class="rooting-container">
+      <div id="float-rooting-container" class="float-rooting-container">
+        <div id="rooting-button" class="rooting-button">
+          <button class="outR" onclick="outR();" type="button" name="outR">X</button>
+          <input type="button" name="rbut" id="rbut" value="Routing">
+        </div>
+        <div id="rooting-list" class="rooting-list scroll"></div>
+      </div>
+    </div>
+    <div id="surf-container" class="surf-container">
+      <input type="button" value="AFFICHE" style="background-image: url('https://i1.wp.com/beagence.com/wp-content/uploads/2021/07/winterlogo-e1608520348804-2.png');background-repeat: no-repeat;background-position: right top;background-size: 5%;border-width : 0.5px 0.5px 0.5px; border-color: grey;height: 150px;width:100%; background-color:#000033; border-radius:5px; border-color: grey ;font-weight: bold;
+      font-size: 90px; color:#FF4F00;font-family:arial;" onclick="activate()">
+      <p style="font-size:20px ;text-align: right; font-weight:bold">€6.79</p>
+      <div class="glob" id="glob"></div>
+      <div class="popup" id="popup">
+        <div class="tab">
+          <button id="btaffiche" class="tablinks" onclick="openCode(event, 'Affiche')">Affiche</button>
+          <button class="tablinks" onclick="openCode(event, 'Connection')">Connection</button>
+          <button style="float:right;" class="tablinks" onclick="openCode(event, 'Inscription')">Inscription</button>
+        </div>
+
+        <div class="bclr">
+          <div class="center">
+            <div class="form">
+              <div class="tabcontent" id="Affiche">
+                <div class="imgcontainer">
+                  <span onclick="ch()" class="close" title="Close Modal">&times;</span>
+                </div>
+                <div class="tab1">
+                  <button id="btaffiche1" class="tablinks1" onclick="openCode1(event, 'Vendre');">Vendre</button>
+                  <button class="tablinks1" onclick="openCode1(event, 'Louer');">Louer</button>
+                </div>
+                <form id="PayForm" action="/checkout" method="post" target="newWindow">
+                  <select name="immob" id="immob" class="input1" placeholder="WHAT?" required>
+                    <option value="Appartement">Appartement</option>
+                    <option value="Maison">Maison | Villa</option>
+                    <option id="vImmob" value="Voiture">Voiture | Auto</option>
+                    <option id="oImmob" value="Ordinateur">Ordinateur | Computer</option>
+                    <option id="sImmob" value="Smartphone">Smartphone (NEW)</option>
+                    <option value="Autres Biens">Autres Biens | Andere</option>
+                  </select><br>
+                  <textarea maxlength="847" name="descr" id="descr" class="input2" placeholder="Description | Beschrijving" required></textarea>
+                  <input type="number" name="descr0" id="descr0" class="input2-0" placeholder="€" required>
+                  <input type="tel" pattern="[+]{1}[0-9]{11,14}" name="descr2" id="descr2" class="input2-1" placeholder="Phone n°" required>
+                  <input type="email" name="descr1" id="descr1" class="input2-2" placeholder="@Mail" required>
+                  <input name="addr" id="addr" type="search" style="margin-top:10px;background-color:white;height:50px;width:85%;border-radius:5px;z-index: 289;" placeholder="Address" class="pac-target-input" autocomplete="off" required>
+                  <br><br>
+                  <input id="coord" type="hidden" name="coord" value="">
+                  <input id="lorv" type="hidden" name="lorv" value="">
+                  <p style="margin-left: 8%; text-align: left; color: white; font-size: 13px;">Vous pouvez ajouter les documents officiels par la suite via votre profil</p>
+                  <p style="margin-left: 8%; text-align: left; color: white; font-size: 13px;">U kan vervolgens officiële documenten toevoegen via uw profiel</p>
+                  <div class="tabcontent1" id="Louer">
+                    <label id="lab3" class="lab3">A LOUER | TE HUUR</label>
+                  </div>
+                  <div class="tabcontent1" id="Vendre">
+                    <label id="lab3" class="lab3">A VENDRE | TE KOOP</label>
+                  </div>
+                  <br>
+                  <input class="input4-2" id="promo" name="promo" placeholder="Promo">
+                  <input class="input4-1" type="button" onclick="submit_pay()" value="Obtenir">
+                </form>
+              </div>
+              <div id="Connection" class="tabcontent">
+                <div class="imgcontainer">
+                  <span onclick="ch()" class="close" title="Close Modal">&times;</span>
+                  <img src="https://i0.wp.com/beagence.com/wp-content/uploads/2021/07/222223814_996278831130222_86742044337327412_n.png?ssl=1&resize=219%2C219" alt="Avatar" class="avatar">
+                </div>
+
+                <div class="container" style="background-color:white;">
+                  <form action="/user-profile" method="post">
+                    <label for="umail"><b>Mail<span style="color: red">*</span></b></label>
+                    <input id="umail1" type="text" placeholder="Enter Mail" name="umail" required>
+
+                    <label for="utel"><b>Phone<span style="color: red">*</span></b></label>
+                    <input id="utel1" type="text" placeholder="Enter Phone" name="utel" required>
+                    <input type="button" onclick="mlsend()" value="Generate PINs"><br>
+                    <p id="genLabel"></p><br>
+                    <label><b>Pins<span style="color: red">*</span></b></label><br>
+                    <input name="mpin" type="text" style="width:40%;" placeholder="Mail PIN" class="input2-1" required>
+                    <br>
+                    <button type="submit">Login</button>
+                  </form>
+                </div>
+              </div>
+              <div id="Inscription" class="tabcontent">
+                <div class="imgcontainer">
+                  <span onclick="ch()" class="close" title="Close Modal">&times;</span>
+                  <img src="https://i0.wp.com/beagence.com/wp-content/uploads/2021/07/222223814_996278831130222_86742044337327412_n.png?ssl=1&resize=219%2C219" alt="Avatar" class="avatar">
+                </div>
+
+                <div class="container" style="background-color:white;">
+                  <label for="umail"><b>Mail<span style="color: red">*</span></b></label>
+                  <input id="umail" type="text" placeholder="Enter Mail" name="umail" required>
+
+                  <label for="utel"><b>Phone<span style="color: red">*</span></b></label>
+                  <input id="utel" type="text" placeholder="Enter Phone" name="utel" required>
+                  <input type="button" disabled="true" onclick="mlsend()" value="Generate PINs"><br>
+                  <p id="genLabel1"></p><br>
+                  <label><b>Pins<span style="color: red">*</span></b></label><br>
+                  <input id="mpin" name="mpin" type="text" style="width:40%;" placeholder="Mail PIN" class="input2-1" required>
+                  <br>
+                  <button type="submit" onclick="sup()" disabled="true">Sign up</button>
+                </div>
+              </div>
+            </div>
+            <br>
+
+          </div>
+
+          <br>
+        </div>
+      </div>
+
+        <div onmousedown="ch()" id="cube-overlay"><div class="exad-modal-overlay"></div></div>
+        <div style="max-width: 40%; float: left;">
+          <p>Prévoyez vos rendez-vous.</p>
+        </div>
+        <div>
+          <p class="has-text-align-right" style="max-width: 40%; float: right;">REOR realestateonresale<br>0479 26 95 89</p>
+        </div>
+        <br>
+        <br>
+        <div class="filter">
+          <input id="loc" style="width:16%; height: 50px;" type="button" name="Location" value="Location">
+          <input id="vente" style="width:16%; height: 50px;" type="button" name="Vente" value="Vente">
+          <select id="Biens" style="width:16%; height: 50px; text-align-last: center;">
+            <option value="" disabled selected hidden>Bien</option>
+            <option value="Appartement">Appartement</option>
+            <option value="Maison">Maison</option>
+            <option value="Voiture">Voiture</option>
+            <option value="Ordinateur">Ordinateur</option>
+            <option value="Telephone">Telephone</option>
+            <option value="Autre Biens">Autre Biens</option>
+          </select>
+          <input style="width:16%; height: 50px;" type="text" name="Prix-min" id="Prix-min" placeholder="Prix min">
+          <input style="width:16%; height: 50px;" type="text" name="Prix-max" id="Prix-max" placeholder="Prix max">
+        </div>
+        <div class="filter">
+          <input id="addr1" type="search" style="background-color:white;height:50px;width:20%;border-radius:5px;z-index: 289;" placeholder="Address" class="pac-target-input" autocomplete="off">
+          <input style="width: 20%; height: 50px; vertical-align: middle;" type="range" id="distance" name="distance" min="0" max="100">
+          <label id="distancelabel" />
+        </div>
+        <button id="filtre" style="width:100%; height: 50px; background-color: #FF4F00;" type="button" name="filtre">Filtrer</button>
+        <input type="button" name="telR" class="rbut" value="Routing" id="rbut1">
+        <div class="btn-desktop-visible" id="mapid" style="z-index:2; width:100%"></div>
+        <div class="downloads">
+          <button id="download1" onclick="window.open('https://mega.nz/file/4NRWABzY#2SX8N0zBrhvAPqBYolVIcR4AfAypUBNalWUvoOFg518','newwindow','width=1000,height=700'); return false;"></button>
+          <button id="download2" onclick="window.open('https://mega.nz/file/wUgSxIxI#YdavMGktZIspH2-fjdh-1ncCKVi64B4A_udh_LwDWu8','newwindow','width=1000,height=700'); return false;"></button>
+        </div>
+        <br>
+      </div>
+  </body>
+</html>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+crossorigin=""></script>
+<script src="map.js"></script>
+<script src="https://beagence.com/wp-content/themes/mthemes/assets/js/map-affiches.js"></script>
