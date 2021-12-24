@@ -467,3 +467,19 @@ function outR(){
   document.getElementById("surf-container").style.display = "block";
   document.getElementById("rooting-container").style.display = "none";
 }
+
+$(document).ready(() => {
+  $('#prices').on('click', () => {
+    $('#prices').toggle();
+  })
+})
+
+$(document).ready(() => {
+  $('#profileButton').on("click", () => {
+    if ($('#profile').is(':empty')){
+      $("#glob").slideToggle(500);
+      $("#popup").slideToggle(500);
+      $('#connectionButton').click();
+    }
+  })
+})

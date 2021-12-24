@@ -29,19 +29,24 @@
         <div id="rooting-button" class="rooting-button">
           <button class="outR" onclick="outR();" type="button" name="outR">X</button>
           <input type="button" name="rbut" id="rbut" value="Routing">
+          <button id="profileButton" style="position: absolute;bottom: 0; left: 0; background-color: white;">
+            <div class="mortyHead">
+              <p style="padding: 4%;">Profil</p>
+            </div>
+            <img src="images/morty1.png" style="width: 100%;">
+          </button>
         </div>
         <div id="rooting-list" class="rooting-list scroll"></div>
       </div>
     </div>
     <div id="surf-container" class="surf-container">
-      <input type="button" value="AFFICHE" style="background-image: url('https://i1.wp.com/beagence.com/wp-content/uploads/2021/07/winterlogo-e1608520348804-2.png');background-repeat: no-repeat;background-position: right top;background-size: 5%;border-width : 0.5px 0.5px 0.5px; border-color: grey;height: 150px;width:100%; background-color:#000033; border-radius:5px; border-color: grey ;font-weight: bold;
+      <input type="button" value="AFFICHE" style="background-image: url('https://i1.wp.com/beagence.com/wp-content/uploads/2021/07/winterlogo-e1608520348804-2.png');background-repeat: no-repeat;background-position: right top;background-size: 5%;border-width : 0.5px 0.5px 0.5px; border-color: grey;height: 150px;width:100%; background-color:#000033; border-radius:5px 5px 0 0; border-color: grey ;font-weight: bold;
       font-size: 90px; color:#FF4F00;font-family:arial;" onclick="activate()">
-      <p style="font-size:20px ;text-align: right; font-weight:bold">€6.79</p>
       <div class="glob" id="glob"></div>
       <div class="popup" id="popup">
         <div class="tab">
           <button id="btaffiche" class="tablinks" onclick="openCode(event, 'Affiche')">Affiche</button>
-          <button class="tablinks" onclick="openCode(event, 'Connection')">Connection</button>
+          <button id="connectionButton" class="tablinks" onclick="openCode(event, 'Connection')">Connection</button>
           <button style="float:right;" class="tablinks" onclick="openCode(event, 'Inscription')">Inscription</button>
         </div>
 
@@ -137,6 +142,7 @@
         </div>
       </div>
 
+      <p style="font-size:20px ;text-align: right; font-weight:bold">€6.79</p>
         <div onmousedown="ch()" id="cube-overlay"><div class="exad-modal-overlay"></div></div>
         <div style="max-width: 40%; float: left;">
           <p>Prévoyez vos rendez-vous.</p>
@@ -174,6 +180,63 @@
           <button id="download2" onclick="window.open('https://mega.nz/file/wUgSxIxI#YdavMGktZIspH2-fjdh-1ncCKVi64B4A_udh_LwDWu8','newwindow','width=1000,height=700'); return false;"></button>
         </div>
         <br>
+      </div>
+      <div id="profile">{{{myProfile}}}</div>
+      <div id="prices">
+        <div class="services">
+          <section class="pricecol">
+          <div class="icon">
+          <i class="icon-magic"></i>
+          </div>
+          <h3><Span>One</span></h3>
+          <ul>
+          <li>6,79€</li>
+          <li>/</li>
+          <li>1 annonce</li>
+          <li>6 mois d'affichage</li>
+          <li>Partage d'annonce</li>
+          </ul>
+          <p>
+          <a class="button"><span>Acheter</span></a>
+          </p>
+          </section>
+
+          <section class="pricecol">
+          <div class="icon">
+          <i class="icon-leaf"></i>
+          </div>
+          <h3><Span>One +</span></h3>
+          <ul>
+          <li>49€</li>
+          <li>Création Profil</li>
+          <li>10 annonces</li>
+          <li>4 mois d'affichage / annonce</li>
+          <li>Abonnement 1 an</li>
+          <li>Partage d'annonce</li>
+          </ul>
+          <p>
+          <a class="button"><span>Se connecter</span></a>
+          </p>
+          </section>
+
+          <section class="pricecol">
+          <div class="icon">
+          <i class="icon-link"></i>
+          </div>
+          <h3><Span>Limitless</span></h3>
+          <ul>
+          <li>25€/mois</li>
+          <li>Création Profil</li>
+          <li>Promotion première années 35% soit 16,25€</li>
+          <li>18 annonces par mois</li>
+          <li>6 mois d'affichage / annonce</li>
+          <li>Partage d'annonce</li>
+          </ul>
+          <p>
+          <a class="button"><span>Se connecter</span></a>
+          </p>
+          </section>
+        </div>
       </div>
   </body>
 </html>
