@@ -1,13 +1,469 @@
-// Initialize the map
-var map = L.map('mapid', {
-  scrollWheelZoom: false
+var bc;
+try {
+  bc = new BroadcastChannel('fm86.7');
+}
+catch(err) {
+  bc = "error";
+}
+var params = [
+  {
+    name: "payment",
+    value: "true"
+  },
+];
+
+function submit_pay(){
+  var form = document.getElementById('PayForm');
+  for(var i=0; i < form.elements.length; i++){
+    if(form.elements[i].value == '' && form.elements[i].hasAttribute('required')){
+      alert('L\'affiche est incomplete! | Incomplete affiche/flyer');
+      return false;
+    }
+  }
+  $.each(params, function(i,param){
+      $('<input />').attr('type', 'hidden')
+          .attr('name', param.name)
+          .attr('value', param.value)
+          .appendTo('#PayForm');
+  });
+  window.open("","newWindow","location=yes,width=800,height=800");
+  var coord = $.get('https://nominatim.openstreetmap.org/search?format=json&q='+document.getElementById("addr").value, function(data) {
+    if (bc != "error"){
+      bc.onmessage = function (ev) {
+        if (ev.data == "pay"){
+          Madder(data[0]["lat"] + "," + data[0]["lon"],document.getElementById("immob").value,document.getElementById("descr").value,document.getElementById("descr1").value,document.getElementById("descr2").value,document.getElementById("descr0").value, document.getElementById("addr").value);
+          ch();
+        }
+      }
+    } else {
+      location.href = "https://beagence.com/surf"
+    }
+    document.getElementById("coord").value = data[0]["lat"] + "," + data[0]["lon"];
+    document.getElementById("PayForm").submit();
+  });
+}
+
+function mlsend(){
+  document.getElementById("genLabel").innerHTML = "Envoye en cours...";
+  document.getElementById("genLabel1").innerHTML = "Envoye en cours...";
+  jQuery(document).ready(function($){
+    $.ajax({
+      url: "https://beagence.com/wp-admin/admin-ajax.php",
+      data: {
+        "action" : "mlsend",
+        "to" : document.getElementById("umail1").value.toLowerCase(),
+        "tel" : document.getElementById("utel1").value,
+        "pin" : makeid(10),
+      },
+      success: function(data){
+        document.getElementById("genLabel").innerHTML = "Le mail a été envoyé";
+        document.getElementById("genLabel1").innerHTML = "Le mail a été envoyé";
+      }
+    })
+  });
+}
+
+function sup(){
+  jQuery(document).ready(function($){
+    $.ajax({
+      url: "https://beagence.com/wp-admin/admin-ajax.php",
+      data: {
+        "action" : "sup",
+        "nom" : "user",
+        "mail" : document.getElementById("umail").value.toLowerCase(),
+        "tel" : document.getElementById("utel").value,
+        "pin" : document.getElementById("mpin").value,
+      },
+      success: function(data){
+        console.log("hieaaa");
+      }
+    })
+  });
+}
+
+function makeid(length) {
+   var result           = '';
+   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+   var charactersLength = characters.length;
+   for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+   }
+   return result;
+}
+
+activate();
+function openCode(evt, codeName) {
+  // All variables must be declared
+  var i, tabcontent, tablinks;
+
+  // Hide all elements with class="tabcontent"
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+
+  // Select all elements with class="tablinks" and remove the "active" class
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+
+  // Display the current tab, and add an "active" class to that displayed button that opened the tab
+  document.getElementById(codeName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+
+function openCode1(evt, codeName) {
+  // All variables must be declared
+  var i, tabcontent, tablinks;
+
+  // Hide all elements with class="tabcontent"
+  tabcontent = document.getElementsByClassName("tabcontent1");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+
+  // Select all elements with class="tablinks" and remove the "active" class
+  tablinks = document.getElementsByClassName("tablinks1");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+
+  // Display the current tab, and add an "active" class to that displayed button that opened the tab
+  document.getElementById(codeName).style.display = "block";
+  evt.currentTarget.className += " active";
+
+  // Add to form
+  document.getElementById("lorv").value = codeName;
+
+  if (codeName == "Louer"){
+    if (!document.getElementById("vImmob").hasAttribute("hidden")){
+      document.getElementById("vImmob").setAttribute("hidden", "");
+      document.getElementById("oImmob").setAttribute("hidden", "");
+      document.getElementById("sImmob").setAttribute("hidden", "");
+    }
+  } else {
+    if (document.getElementById("vImmob").hasAttribute("hidden")){
+      document.getElementById("vImmob").removeAttribute("hidden");
+      document.getElementById("oImmob").removeAttribute("hidden");
+      document.getElementById("sImmob").removeAttribute("hidden");
+    }
+  }
+}
+
+var mymap;
+var markers;
+$(document).ready(() => {
+  function loadMap(){
+    mymap = L.map('mapid').setView([50.503887, 4.469936], 9);
+    markers = L.markerClusterGroup();
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(mymap);
+  }
+  function refreshMap(){
+    mymap.off();
+    mymap.remove();
+    loadMap();
+  }
+  loadMap();
+})
+
+
+
+
+//L.Routing.control({
+//  waypoints: [L.latLng(49.47748, 8.42216), L.latLng(49.47648, 8.32216)]
+//}).addTo(mymap);
+
+function Madder(address, immob, descr, descr1, descr2, descr0, adStr){
+
+  if (address != undefined){
+    var streetviewurl = "https://maps.googleapis.com/maps/api/streetview?size=300x200&location=" + address.split(",")[0] + "," + address.split(",")[1] + "&fov=80&pitch=0&key=AIzaSyAjnjte7sQ7iJC9uZK9IyR2QkOj7VH48h4";
+    var greenIcon = L.icon({
+      iconUrl: "https://i1.wp.com/beagence.com/wp-content/uploads/2021/07/winterlogo-e1608520348804-2.png",
+
+      iconSize:     [50, 64], // size of the icon
+      iconAnchor:   [4, 62], // point of the icon which will correspond to marker's location
+      popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+    var img = $('<img />', {src : streetviewurl});
+    var marker = L.marker([address.split(",")[0], address.split(",")[1]], {icon: greenIcon});
+    markers.addLayer(marker);
+    var pp = ('<a target="_blank" href="https://www.google.com/maps/place/' + address.split(",")[0] + "," + address.split(",")[1] + '">' + img[0]['outerHTML'] + '</a>' + '<div class="leaflet-popup-hcontent"><p style=\'text-align:center;color:#000033;font-size:30px ;background-color:#ff4f00;border-radius:2px;border:2px\'>' +  immob + '</p><p style=\'background-color:white;border-radius:2px\'>' + descr +'</p>' + "<a href='mailto:" + descr1.toLowerCase() + "'>Mail: " + descr1.toLowerCase() + "</a>" + '<p style=\'background-color:white;border-radius:2px\'>Tel: ' + descr2 +'</p>' + '<p style=\'background-color:white;border-radius:2px\'>Prix: ' + descr0 +'</p></div><button type="button" name="affSave" id="affSave" onclick="affSave();">Save</button><input id="affLoc" type="hidden" value="' + adStr + '">')
+    marker.bindPopup(pp);
+    mymap.addLayer(markers);
+  };
+}
+
+var x = document.getElementsByClassName("simpay-btn simpay-payment-btn stripe-button-el");
+function ch(){
+    $("#glob").slideToggle(500);
+    $("#popup").slideToggle(500);
+}
+
+$(document).ready(function(){
+  $("#glob").on("click", function(e){
+    ch();
+  })
+})
+
+function activate(){
+    $("#glob").slideToggle(500);
+    $("#popup").slideToggle(500);
+    var button = $('#btaffiche');
+    button.click();
+    var button = $('#btaffiche1');
+    button.click();
+}
+let autocomplete;
+let autocomplete1;
+let address1Field;
+let address2Field;
+let postalField;
+
+function initAutocomplete() {
+  address1Field = document.querySelector("#addr");
+  address2Field = document.querySelector("#addr1");
+  // Create the autocomplete object, restricting the search predictions to
+  // addresses in the US and Canada.
+  autocomplete = new google.maps.places.Autocomplete(address1Field);
+  autocomplete1 = new google.maps.places.Autocomplete(address2Field);
+  address1Field.focus();
+  address2Field.focus();
+  // When the user selects an address from the drop-down, populate the
+  // address fields in the form.
+  autocomplete.addListener("place_changed", fillInAddress);
+  autocomplete1.addListener("place_changed", fillInAddress1);
+}
+
+function fillInAddress() {
+  // Get the place details from the autocomplete object.
+  const place = autocomplete.getPlace();
+  let address1 = "";
+
+  // Get each component of the address from the place details,
+  // and then fill-in the corresponding field on the form.
+  // place.address_components are google.maps.GeocoderAddressComponent objects
+  // which are documented at http://goo.gle/3l5i5Mr
+  for (const component of place.address_components) {
+    const componentType = component.types[0];
+    switch (componentType) {
+      case "street_number": {
+        address1 = `${address1} ${component.long_name}`;
+        break;
+      }
+
+      case "route": {
+        address1 = `${component.long_name} ${address1}`;
+        break;
+      }
+
+      case "locality": {
+        address1 = `${address1}, ${component.long_name}`;
+        break;
+      }
+    }
+  }
+  address1Field.value = address1;
+  // After filling the form with address components from the Autocomplete
+  // prediction, set cursor focus on the second address line to encourage
+  // entry of subpremise information such as apartment, unit, or floor number.
+}
+
+function fillInAddress1() {
+  // Get the place details from the autocomplete object.
+  const place = autocomplete1.getPlace();
+  let address1 = "";
+
+  // Get each component of the address from the place details,
+  // and then fill-in the corresponding field on the form.
+  // place.address_components are google.maps.GeocoderAddressComponent objects
+  // which are documented at http://goo.gle/3l5i5Mr
+  for (const component of place.address_components) {
+    const componentType = component.types[0];
+    console.log(componentType);
+    switch (componentType) {
+      case "locality": {
+        address1 = `${address1} ${component.long_name}`;
+        break;
+      }
+      case "administrative_area_level_1": {
+        address1 = `${address1} ${component.long_name}`;
+      }
+      case "country": {
+        address1 = `${address1} ${component.long_name}`;
+      }
+    }
+  }
+  address2Field.value = address1;
+  // After filling the form with address components from the Autocomplete
+  // prediction, set cursor focus on the second address line to encourage
+  // entry of subpremise information such as apartment, unit, or floor number.
+}
+
+$(function() {
+  var loc = document.getElementById("loc");
+  var vente = document.getElementById("vente");
+  loc.addEventListener("click", function() {
+    if (loc.hasAttribute("selected")){
+      loc.style = "width:10%; height: 50px;";
+      loc.removeAttribute("selected");
+    }
+    else {
+      loc.style = "width:10%; height: 50px; border: 0; border-radius: 5px; background-color: #000033; color: #FF4F00;";
+      loc.setAttribute("selected", "");
+    }
+  })
+  vente.addEventListener("click", function() {
+    if (vente.hasAttribute("selected")){
+      vente.style = "width:10%; height: 50px;";
+      vente.removeAttribute("selected");
+    }
+    else {
+      vente.style = "width:10%; height: 50px; border: 0; border-radius: 5px; background-color: #000033; color: #FF4F00;";
+      vente.setAttribute("selected", "");
+    }
+  })
 });
 
-// Set the position and zoom level of the map
-map.setView([47.70, 13.35], 7);
+$(function() {
+  // on page load, set the text of the label based the value of the range
+    $('#distancelabel').text($('#distance').val() + " KM");
 
-// Initialize the base layer
-var osm_mapnik = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-	maxZoom: 19,
-	attribution: '&copy; OSM Mapnik <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-}).addTo(map);
+    // setup an event handler to set the text when the range value is dragged (see event for input) or changed (see event for change)
+    $('#distance').on('input change', function () {
+        $('#distancelabel').text($(this).val() + " KM");
+    });
+})
+
+$(document).ready(() => {
+  $.ajax({
+    url: "/getAffs",
+    success: function(data){
+      Object.keys(data).forEach(function(key) {
+        Madder(data[key].location, data[key].title, data[key].description, data[key].mail, data[key].tel, data[key].prix, data[key].address);
+      })
+    }
+  })
+});
+
+$(function() {
+  $('#filtre').on('click', function() {
+    var initAddr = document.getElementById("addr1").value;
+
+    refreshMap();
+    jQuery(document).ready(function($){
+      $.ajax({
+        url: "https://beagence.com/wp-admin/admin-ajax.php",
+        data: {
+          "action" : "getAffs",
+        },
+        success: function(data){
+          const affs = JSON.parse(data.slice(0,-1))["affs"];
+          Object.keys(affs).forEach(function(key) {
+            var accepted = true;
+            console.log(affs[key][1]);
+            if (!document.getElementById("loc").hasAttribute("selected")){
+              if (affs[key][1] == "Louer"){
+                accepted = false;
+              }
+            }
+            if (!document.getElementById("vente").hasAttribute("selected")){
+              if (affs[key][1] == "Vendre"){
+                accepted = false;
+              }
+            }
+            if (document.getElementById("Biens").value != ""){
+              if (document.getElementById("Biens").value != affs[key][0]){
+                accepted = false;
+              }
+            }
+            if (document.getElementById("Prix-min").value != ""){
+              if ((document.getElementById("Prix-min").value - affs[key][5]) > 0){
+                accepted = false;
+              }
+            }
+            if (document.getElementById("Prix-max").value != ""){
+              if ((document.getElementById("Prix-max").value - affs[key][5]) < 0){
+                accepted = false;
+              }
+            }
+            if (document.getElementById("addr1").value != ""){
+              var coord = $.get('https://nominatim.openstreetmap.org/search?format=json&q='+initAddr, function(data) {
+                var marker = L.marker([data["0"]["lat"], data["0"]["lon"]]);
+                var marker1 = L.marker([key.split(",")[0], key.split(",")[1]])
+                if ((marker.getLatLng().distanceTo(marker1.getLatLng()).toFixed(0)/1000) > document.getElementById("distance").value){
+                  accepted = false;
+                }
+                if (accepted){
+                  Madder(key, affs[key][0], affs[key][2], affs[key][3], affs[key][4], affs[key][5], affs[key][6]);
+                }
+              });
+            } else if (accepted) {
+              Madder(key, affs[key][0], affs[key][2], affs[key][3], affs[key][4], affs[key][5], affs[key][6]);
+            }
+          })
+        }
+      })
+    });
+  })
+})
+
+function remRLI(event){
+  document.getElementById(event['srcElement']['title']).remove();
+}
+
+function affSave(){
+  var urlrock;
+  if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent)
+      || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navigator.userAgent.substr(0,4))) {
+    urlrock = "https://i0.wp.com/beagence.com/wp-content/uploads/2021/09/rocket.png?ssl=1&resize=219%2C219";
+  } else {
+    urlrock = "https://img.icons8.com/external-kiranshastry-lineal-color-kiranshastry/64/000000/external-airplane-logistic-delivery-kiranshastry-lineal-color-kiranshastry.png";
+  }
+  $.when($('#trainD').append('<img id="train" class="train" src="' + urlrock + '">')).done(function() {
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    async function Tutor() {
+      await sleep(1000);
+      if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent)
+          || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navigator.userAgent.substr(0,4))) {
+          document.getElementById("train").style.top = "100%";
+      } else {
+        document.getElementById("train").style.left = "80%";
+      }
+      await sleep(5000);
+      document.getElementById("train").remove();
+      $('#rooting-list').append('<div id="' + document.getElementById("affLoc").value + '" class="routing-list-items"><p style="width: 70%; float: left;">' + document.getElementById("affLoc").value + '</p><div class="imgcontainer1"><span onclick="remRLI(event);" class="close1" title="' + document.getElementById("affLoc").value + '">×</span></div></div>');
+    }
+    Tutor();
+  })
+}
+$(document).ready(() => {
+  $('#rbut').on("click", function() {
+    var hrf = "https://www.google.com/maps/dir/";
+    $.when(
+      $('#rooting-list').children('div').each(function () {
+        hrf += this.id + "/"; // "this" is the current element in the loop
+      })
+    ).done(function() {
+      window.open(hrf,"","location=yes,width=800,height=800");
+    })
+  })
+
+  $('#rbut1').on("click", function() {
+    document.getElementById("outR").style.display = "block";
+    document.getElementById("surf-container").style.display = "none";
+    document.getElementById("rooting-container").style.display = "block";
+    document.getElementById("rooting-container").style.width = "100%";
+    document.getElementById("rooting-button").style.width = "100%";
+    document.getElementById("float-rooting-container").style.width = "100%";
+  })
+})
+
+function outR(){
+  document.getElementById("surf-container").style.display = "block";
+  document.getElementById("rooting-container").style.display = "none";
+}
