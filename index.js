@@ -40,7 +40,6 @@ app.get('/getAffs', function(req, res) {
 app.use(express.static('content/static'));
 
 https.createServer({
-  key: fs.readFileSync("immo.surf.key"),
   cert: fs.readFileSync('immo.surf.crt'),
   ca: fs.readFileSync('immo.surf.ca-bundle')
 }, app).listen(3000)
