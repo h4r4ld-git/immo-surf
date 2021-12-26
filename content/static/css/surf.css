@@ -219,10 +219,9 @@ button, .button, input[type="submit"], .a8c-posts-list__view-all, button[data-lo
 }
 
 .popup{
-  display:none; z-index:1000;
-  position:absolute;
-  width: 69.4%;
-	height: 70%;
+  display: none;
+  width: 100%;
+  z-index: 10000000;
 }
 
 
@@ -312,14 +311,12 @@ button, .button, input[type="submit"], .a8c-posts-list__view-all, button[data-lo
 .tabcontent {
   display: none;
   padding: 5px 10px;
-	border-radius: 2px;
   border-top: none;
 }
 
 .tabcontent1 {
   display: none;
   padding: 5px 10px;
-	border-radius: 2px;
   border-top: none;
 }
 
@@ -516,7 +513,7 @@ span.psw {
   width: 100%;
 	border: 0;
 	background: rgba(0, 0, 0, 0.5);
-  z-index: 998;
+  z-index: 2000;
 }
 
 .rooting-container{
@@ -616,7 +613,6 @@ span.psw {
 
 .filter{
   width: 100%;
-  display: inline-block;
   text-align: center;
   height:10%;
   vertical-align: top; /* added */
@@ -885,6 +881,11 @@ li
 padding:10px 0px;
 border-top:1px solid rgb(51, 60, 64);
 border-bottom:1px solid rgb(25, 31, 34);
+}
+
+#afficheBut{
+  background-image: url('https://i1.wp.com/beagence.com/wp-content/uploads/2021/07/winterlogo-e1608520348804-2.png');background-repeat: no-repeat;background-position: right top;background-size: 5%;border-width : 0.5px 0.5px 0.5px; border-color: grey;height: 150px;width:100%; background-color:#000033; border-radius:5px 5px 0 0; border-color: grey ;font-weight: bold;
+  font-size: 90px; color:#FF4F00;font-family:arial;
 }
 
 .mortyHead{

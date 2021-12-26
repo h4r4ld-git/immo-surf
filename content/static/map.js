@@ -32,7 +32,7 @@ function submit_pay(){
       bc.onmessage = function (ev) {
         if (ev.data == "pay"){
           Madder(data[0]["lat"] + "," + data[0]["lon"],document.getElementById("immob").value,document.getElementById("descr").value,document.getElementById("descr1").value,document.getElementById("descr2").value,document.getElementById("descr0").value, document.getElementById("addr").value);
-          ch();
+          activate();
         }
       }
     } else {
@@ -63,24 +63,6 @@ function mlsend(){
   });
 }
 
-function sup(){
-  jQuery(document).ready(function($){
-    $.ajax({
-      url: "https://beagence.com/wp-admin/admin-ajax.php",
-      data: {
-        "action" : "sup",
-        "nom" : "user",
-        "mail" : document.getElementById("umail").value.toLowerCase(),
-        "tel" : document.getElementById("utel").value,
-        "pin" : document.getElementById("mpin").value,
-      },
-      success: function(data){
-        console.log("hieaaa");
-      }
-    })
-  });
-}
-
 function makeid(length) {
    var result           = '';
    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -91,7 +73,6 @@ function makeid(length) {
    return result;
 }
 
-activate();
 function openCode(evt, codeName) {
   // All variables must be declared
   var i, tabcontent, tablinks;
@@ -151,30 +132,25 @@ function openCode1(evt, codeName) {
   }
 }
 
+// Map
+
 var mymap;
 var markers;
+function loadMap(){
+  mymap = L.map('mapid').setView([50.503887, 4.469936], 9);
+  markers = L.markerClusterGroup();
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(mymap);
+}
+function refreshMap(){
+  mymap.off();
+  mymap.remove();
+  loadMap();
+}
 $(document).ready(() => {
-  function loadMap(){
-    mymap = L.map('mapid').setView([50.503887, 4.469936], 9);
-    markers = L.markerClusterGroup();
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(mymap);
-  }
-  function refreshMap(){
-    mymap.off();
-    mymap.remove();
-    loadMap();
-  }
   loadMap();
 })
-
-
-
-
-//L.Routing.control({
-//  waypoints: [L.latLng(49.47748, 8.42216), L.latLng(49.47648, 8.32216)]
-//}).addTo(mymap);
 
 function Madder(address, immob, descr, descr1, descr2, descr0, adStr){
 
@@ -196,26 +172,10 @@ function Madder(address, immob, descr, descr1, descr2, descr0, adStr){
   };
 }
 
-var x = document.getElementsByClassName("simpay-btn simpay-payment-btn stripe-button-el");
-function ch(){
-    $("#glob").slideToggle(500);
-    $("#popup").slideToggle(500);
-}
-
-$(document).ready(function(){
-  $("#glob").on("click", function(e){
-    ch();
-  })
-})
-
 function activate(){
-    $("#glob").slideToggle(500);
     $("#popup").slideToggle(500);
-    var button = $('#btaffiche');
-    button.click();
-    var button = $('#btaffiche1');
-    button.click();
 }
+
 let autocomplete;
 let autocomplete1;
 let address1Field;
@@ -338,13 +298,10 @@ $(function() {
 })
 
 $(document).ready(() => {
-  $.ajax({
-    url: "/getAffs",
-    success: function(data){
-      Object.keys(data).forEach(function(key) {
-        Madder(data[key].location, data[key].title, data[key].description, data[key].mail, data[key].tel, data[key].prix, data[key].address);
-      })
-    }
+  $.post("/getAffs",function(data){
+    Object.keys(data).forEach(function(key) {
+      Madder(data[key].location, data[key].title, data[key].description, data[key].mail, data[key].tel, data[key].prix, data[key].address);
+    })
   })
 });
 
@@ -353,39 +310,34 @@ $(function() {
     var initAddr = document.getElementById("addr1").value;
 
     refreshMap();
-    jQuery(document).ready(function($){
-      $.ajax({
-        url: "https://beagence.com/wp-admin/admin-ajax.php",
-        data: {
-          "action" : "getAffs",
-        },
-        success: function(data){
-          const affs = JSON.parse(data.slice(0,-1))["affs"];
-          Object.keys(affs).forEach(function(key) {
+    $(document).ready(function(){
+      $.post("/getAffs", function(data){
+        const affs = data;
+        Object.keys(affs).forEach(function(key) {
             var accepted = true;
-            console.log(affs[key][1]);
+            const locvent = affs[key].locvent;
             if (!document.getElementById("loc").hasAttribute("selected")){
-              if (affs[key][1] == "Louer"){
+              if (affs[key].locvent == "Louer"){
                 accepted = false;
               }
             }
             if (!document.getElementById("vente").hasAttribute("selected")){
-              if (affs[key][1] == "Vendre"){
+              if (affs[key].locvent == "Vendre"){
                 accepted = false;
               }
             }
             if (document.getElementById("Biens").value != ""){
-              if (document.getElementById("Biens").value != affs[key][0]){
+              if (document.getElementById("Biens").value != affs[key].title){
                 accepted = false;
               }
             }
             if (document.getElementById("Prix-min").value != ""){
-              if ((document.getElementById("Prix-min").value - affs[key][5]) > 0){
+              if ((document.getElementById("Prix-min").value - affs[key].prix) > 0){
                 accepted = false;
               }
             }
             if (document.getElementById("Prix-max").value != ""){
-              if ((document.getElementById("Prix-max").value - affs[key][5]) < 0){
+              if ((document.getElementById("Prix-max").value - affs[key].prix) < 0){
                 accepted = false;
               }
             }
@@ -397,15 +349,15 @@ $(function() {
                   accepted = false;
                 }
                 if (accepted){
-                  Madder(key, affs[key][0], affs[key][2], affs[key][3], affs[key][4], affs[key][5], affs[key][6]);
+                  Madder(data[key].location, data[key].title, data[key].description, data[key].mail, data[key].tel, data[key].prix, data[key].address);
                 }
               });
             } else if (accepted) {
-              Madder(key, affs[key][0], affs[key][2], affs[key][3], affs[key][4], affs[key][5], affs[key][6]);
+              Madder(data[key].location, data[key].title, data[key].description, data[key].mail, data[key].tel, data[key].prix, data[key].address);
             }
           })
         }
-      })
+      )
     });
   })
 })
@@ -481,5 +433,75 @@ $(document).ready(() => {
       $("#popup").slideToggle(500);
       $('#connectionButton').click();
     }
+  })
+})
+
+$(document).ready(() => {
+  $('#afficheBut').on("click", () => {
+    activate();
+    $('#btaffiche').click();
+    $('#btaffiche1').click();
+  })
+})
+
+$(document).ready(() => {
+  $('#packOneBut').on("click", function() {
+    $('#prices').slideToggle();
+    activate();
+    $('#btaffiche').click();
+    $('#btaffiche1').click();
+  })
+  $('#packOnePlusBut').on("click", function() {
+    $('#prices').slideToggle();
+    activate();
+    $('#connectionButton').click();
+  })
+  $('#packUnlimitedBut').on("click", function() {
+    $('#prices').slideToggle();
+    activate();
+    $('#connectionButton').click();
+  })
+})
+
+function success(msg) {
+  return `
+  <article class="message is-primary">
+  <div class="message-body">
+  ${msg}
+  </div>
+  </article>`;
+}
+
+function error(msg) {
+  return `
+  <article class="message is-danger">
+  <div class="message-body">
+  ${msg}
+  </div>
+  </article>`;
+}
+
+$(document).ready(() => {
+  $('#registerBut').click(() => {
+    $.post('/register', {
+        "name" : $('#uname').val(),
+        "mail" : $('#umail').val(),
+        "tel" : $('#utel').val(),
+      }, (data) => {
+        var regMessage;
+        if (data === "Empty") {
+          regMessage = error("Veuillez remplire chaque champs pour vous inscrire");
+        } else if (data === "Mail"){
+          regMessage = error("Votre adresse email n'est pas valide")
+        } else if (data === "Phone"){
+          regMessage = error("Votre numéro de GSM n'est pas valide")
+        } else if (data === "Found"){
+          regMessage = error("L'adresse email est déja enregistré dans la base. Veuillez indiquer une autre adresse email");
+        } else if (data === "Valid") {
+          regMessage = success("Votre profil à été crée avec succés. Veuillez consulter votre boite email pour récupérer le PIN");
+        }
+        $('#register-response').html(regMessage)
+      }
+    )
   })
 })
