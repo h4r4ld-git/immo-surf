@@ -509,13 +509,11 @@ $(document).ready(() => {
 $(document).ready(() => {
   $('#genPin').click(() =>{
     document.getElementById("genLabel").innerHTML = "Envoye en cours...";
-    document.getElementById("genLabel1").innerHTML = "Envoye en cours...";
     $.post('/validPin', {
         "mail" : $('#umail1').val()
       }, (data) => {
         if (data === "sent"){
           document.getElementById("genLabel").innerHTML = "Le mail a été envoyé";
-          document.getElementById("genLabel1").innerHTML = "Le mail a été envoyé";
         }
       }
     )
