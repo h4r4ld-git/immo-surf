@@ -61,7 +61,7 @@ function openCode(evt, codeName) {
 
   // Display the current tab, and add an "active" class to that displayed button that opened the tab
   document.getElementById(codeName).style.display = "block";
-  evt.currentTarget.className += " active";
+  evt.className += " active";
 }
 
 function openCode1(evt, codeName) {
@@ -82,7 +82,7 @@ function openCode1(evt, codeName) {
 
   // Display the current tab, and add an "active" class to that displayed button that opened the tab
   document.getElementById(codeName).style.display = "block";
-  evt.currentTarget.className += " active";
+  evt.className += " active";
 
   // Add to form
   document.getElementById("lorv").value = codeName;
@@ -405,8 +405,10 @@ $(document).ready(() => {
 $(document).ready(() => {
   $('#afficheBut').on("click", () => {
     activate();
-    $('#btaffiche').click();
-    $('#btaffiche1').click();
+    $(document).ready(() => {
+      $('#btaffiche').click();
+      $('#btaffiche1').click();
+    })
   })
 })
 
