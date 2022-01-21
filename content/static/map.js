@@ -90,14 +90,10 @@ function openCode1(evt, codeName) {
   if (codeName == "Louer"){
     if (!document.getElementById("vImmob").hasAttribute("hidden")){
       document.getElementById("vImmob").setAttribute("hidden", "");
-      document.getElementById("oImmob").setAttribute("hidden", "");
-      document.getElementById("sImmob").setAttribute("hidden", "");
     }
   } else {
     if (document.getElementById("vImmob").hasAttribute("hidden")){
       document.getElementById("vImmob").removeAttribute("hidden");
-      document.getElementById("oImmob").removeAttribute("hidden");
-      document.getElementById("sImmob").removeAttribute("hidden");
     }
   }
 }
