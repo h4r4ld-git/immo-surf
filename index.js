@@ -111,7 +111,6 @@ app.post('/validPin', function(req, res) {
   if (!email){
     res.send("Empty");
   } else {
-    tel = tel.replace(/\D/g, '');
     MongoClient.connect(dbURL, function(err, client) {
       db = client.db("immo-surf").collection("users")
       db.findOne({"email": email}, function(err, result){
