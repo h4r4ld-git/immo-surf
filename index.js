@@ -7,6 +7,7 @@ const https = require('https');
 const fs = require('fs');
 const dotenv = require('dotenv');
 const validator = require('validator')
+const pinSender = require('../lib/MailSender')
 
 const {MongoClient} = require('mongodb');
 const dbURL = "mongodb+srv://h4r4ld:.feEM5*46pXzFM4@surf.hdzzn.mongodb.net/"
@@ -58,7 +59,8 @@ app.post('/register', function(req, res) {
           } else if (!/^\d+$/.test(tel)){
             res.send("Phone")
           } else {
-            //db.insertOne({"name": name, "email": email, "tel": tel});
+            const id = pinSender.send(email);
+            db.insertOne({"name": name, "email": email, "tel": tel, "pin": id});
             res.send("Valid")
           }
         }
