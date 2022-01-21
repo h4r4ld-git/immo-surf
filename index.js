@@ -143,6 +143,7 @@ app.get('/tmpValid', function(req, res){
           res.send("URL n'est plus valide")
         } else {
           client.db("immo-surf").collection("users").updateOne({"email" : result.email}, {$set : {"pin" : result.npin}})
+          client.db("immo-surf").collection("valid").deleteOne({"email" : result.email})
           res.send("Pin modifié");
         }
       })
