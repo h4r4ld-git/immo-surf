@@ -98,21 +98,23 @@ input[type="number"]{
   height: 140px;
 }
 .input4-1{
-    border: 0;
-    border-radius: 5px;
-    margin-top: 5px;
-	  padding-top: 0;
-		background-color: rgba(0,0,0,0.9);
-    color: white;
-    height:40px;
-    width:40%;
-    float:right;
-    margin-right: 10px;
-    transition: 0.5;
+  transition: 0.3s;
+  border-radius: 5px;
+  border-color: white;
+  color: white;
+  margin-top: 5px;
+  background-color: rgba(0,0,0,0.9);
+  outline: none;
+  cursor: pointer;
+  height:40px;
+  width:20%;
+  float:right;
+  margin-right: 10px;
 }
 
 .input4-1:hover{
-  background-color: #303030;
+  background-color: #ddd;
+  color: black;
 }
 
 .input4-2{

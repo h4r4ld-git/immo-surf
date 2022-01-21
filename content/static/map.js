@@ -517,3 +517,7 @@ $(document).ready(() => {
     )
   })
 })
+
+$(document).ready(() => {
+  $('.box').toggle();
+})
