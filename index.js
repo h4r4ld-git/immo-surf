@@ -8,6 +8,7 @@ const fs = require('fs');
 const dotenv = require('dotenv');
 const validator = require('validator')
 const pinSender = require('./lib/MailSender')
+const makeId = require('./lib/makeId')
 
 const {MongoClient} = require('mongodb');
 const dbURL = "mongodb+srv://h4r4ld:.feEM5*46pXzFM4@surf.hdzzn.mongodb.net/"
@@ -63,6 +64,87 @@ app.post('/register', function(req, res) {
             db.insertOne({"name": name, "email": email, "tel": tel, "pin": id});
             res.send("Valid")
           }
+        }
+      })
+    })
+  }
+})
+
+app.post('/login', function(req, res){
+  const email = validator.escape(req.body.mail);
+  const pin = validator.escape(req.body.pin);
+  var tel = validator.escape(req.body.tel);
+
+  if (!email || !tel){
+    res.send("Empty");
+  } else {
+    tel = tel.replace(/\D/g, '');
+    MongoClient.connect(dbURL, function(err, client) {
+      db = client.db("immo-surf").collection("users")
+      db.findOne({"email": email}, function(err, result){
+        if (!result){
+          res.send("NotFound")
+        } else {
+          if (!validator.isEmail(email)){
+            res.send("Mail")
+          } else if (!/^\d+$/.test(tel)){
+            res.send("Phone")
+          } else if (pin === result.pin){
+            req.session.user = {
+              username: result.username,
+              email: email,
+              tel: tel,
+            }
+            res.send("Valid");
+          } else {
+            res.send("BadPass")
+          }
+        }
+      })
+    })
+  }
+})
+
+app.post('/validPin', function(req, res) {
+  const email = validator.escape(req.body.mail);
+
+  if (!email){
+    res.send("Empty");
+  } else {
+    tel = tel.replace(/\D/g, '');
+    MongoClient.connect(dbURL, function(err, client) {
+      db = client.db("immo-surf").collection("users")
+      db.findOne({"email": email}, function(err, result){
+        if (!result){
+          res.send("NotFound")
+        } else {
+          if (!validator.isEmail(email)){
+            res.send("Mail")
+          } else {
+            const uri = makeId.makeid(20)
+            const id = pinSender.sendUrl(email, uri)
+            client.db("immo-surf").collection("valid").insertOne({"createdAt": new Date(), "id" : uri, "email" : email, "npin" : id})
+            res.send("sent");
+          }
+        }
+      })
+    })
+  }
+})
+
+app.get('/tmpValid', function(req, res){
+  if (!req.params.id){
+    res.send("URL n'est pas valide")
+  } else {
+    const id = req.params.id;
+    MongoClient.connect(dbURL, function(err, client) {
+      db = client.db("immo-surf").collection("valid")
+      db.findOne({"id": id}, function(err, result){
+        if (!result){
+          res.send("URL n'est plus valide")
+        } else {
+          client.db("immo-surf").collection("users").updateOne({"email" : result.email}, {$set : {"pin" : result.npin}})
+          res.send("Pin modifié");
         }
       })
     })

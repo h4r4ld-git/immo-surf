@@ -43,26 +43,6 @@ function submit_pay(){
   });
 }
 
-function mlsend(){
-  document.getElementById("genLabel").innerHTML = "Envoye en cours...";
-  document.getElementById("genLabel1").innerHTML = "Envoye en cours...";
-  jQuery(document).ready(function($){
-    $.ajax({
-      url: "https://beagence.com/wp-admin/admin-ajax.php",
-      data: {
-        "action" : "mlsend",
-        "to" : document.getElementById("umail1").value.toLowerCase(),
-        "tel" : document.getElementById("utel1").value,
-        "pin" : makeid(10),
-      },
-      success: function(data){
-        document.getElementById("genLabel").innerHTML = "Le mail a été envoyé";
-        document.getElementById("genLabel1").innerHTML = "Le mail a été envoyé";
-      }
-    })
-  });
-}
-
 function openCode(evt, codeName) {
   // All variables must be declared
   var i, tabcontent, tablinks;
@@ -488,9 +468,55 @@ $(document).ready(() => {
         } else if (data === "Found"){
           regMessage = error("L'adresse email est déja enregistré dans la base. Veuillez indiquer une autre adresse email");
         } else if (data === "Valid") {
+          $('#uname').val("")
+          $('#umail').val("")
+          $('#utel').val("")
           regMessage = success("Votre profil à été crée avec succés. Veuillez consulter votre boite email pour récupérer le PIN");
         }
         $('#register-response').html(regMessage)
+      }
+    )
+  })
+})
+
+$(document).ready(() => {
+  $('#connectBut').click(() => {
+    $.post('/login', {
+        "mail" : $('#umail1').val(),
+        "tel" : $('#utel1').val(),
+        "pin" : $('#mpin').val()
+      }, (data) => {
+        var logMessage;
+        if (data === "Empty") {
+          logMessage = error("Veuillez remplire chaque champs pour vous connecter")
+        } else if (data === "Mail"){
+          logMessage = error("Votre adresse email n'est pas valide")
+        } else if (data === "Phone"){
+          logMessage = error("Votre numéro de GSM n'est pas valide")
+        } else if (data === "NotFound"){
+          logMessage = error("L'adresse email n'est pas enregistré dans la base")
+        } else if (data === "BadPass"){
+          logMessage = error("Mot de passe incorrect")
+        } else if (data === "Valid"){
+          window.location.reload();
+        }
+        $('#login-response').html(logMessage)
+      }
+    )
+  })
+})
+
+$(document).ready(() => {
+  $('#genPin').click(() =>{
+    document.getElementById("genLabel").innerHTML = "Envoye en cours...";
+    document.getElementById("genLabel1").innerHTML = "Envoye en cours...";
+    $.post('/validPin', {
+        "mail" : $('#umail1').val()
+      }, (data) => {
+        if (data === "sent"){
+          document.getElementById("genLabel").innerHTML = "Le mail a été envoyé";
+          document.getElementById("genLabel1").innerHTML = "Le mail a été envoyé";
+        }
       }
     )
   })
