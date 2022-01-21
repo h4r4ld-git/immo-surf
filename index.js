@@ -132,10 +132,10 @@ app.post('/validPin', function(req, res) {
 })
 
 app.get('/tmpValid', function(req, res){
-  if (!req.params.id){
+  if (!req.query.id){
     res.send("URL n'est pas valide")
   } else {
-    const id = req.params.id;
+    const id = req.query.id;
     MongoClient.connect(dbURL, function(err, client) {
       db = client.db("immo-surf").collection("valid")
       db.findOne({"id": id}, function(err, result){
