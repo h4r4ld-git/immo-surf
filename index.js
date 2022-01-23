@@ -107,9 +107,10 @@ app.post('/login', function(req, res){
 
 app.post('/validPin', function(req, res) {
   const email = validator.escape(req.body.mail);
-
   if (!email){
     res.send("Empty");
+  } else if (!validator.isEmail(email)){
+    res.send("Mail");
   } else {
     MongoClient.connect(dbURL, function(err, client) {
       db = client.db("immo-surf").collection("users")
@@ -117,14 +118,10 @@ app.post('/validPin', function(req, res) {
         if (!result){
           res.send("NotFound")
         } else {
-          if (!validator.isEmail(email)){
-            res.send("Mail")
-          } else {
-            const uri = makeId.makeid(20)
-            const id = pinSender.sendUrl(email, uri)
-            client.db("immo-surf").collection("valid").insertOne({"createdAt": new Date(), "id" : uri, "email" : email, "npin" : id})
-            res.send("sent");
-          }
+          const uri = makeId.makeid(20)
+          const id = pinSender.sendUrl(email, uri)
+          client.db("immo-surf").collection("valid").insertOne({"createdAt": new Date(), "id" : uri, "email" : email, "npin" : id})
+          res.send("sent");
         }
       })
     })

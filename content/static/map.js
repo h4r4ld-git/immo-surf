@@ -512,6 +512,12 @@ $(document).ready(() => {
       }, (data) => {
         if (data === "sent"){
           document.getElementById("genLabel").innerHTML = "Le mail a été envoyé";
+        } else if (data === "Mail"){
+          document.getElementById("genLabel").innerHTML = "Données incorrect";
+        } else if (data === "Empty"){
+          document.getElementById("genLabel").innerHTML = "Le champ de l'email est vide";
+        } else if (data === "NotFound"){
+          document.getElementById("genLabel").innerHTML = "Aucun utilisateur est associé à cet email";
         }
       }
     )
