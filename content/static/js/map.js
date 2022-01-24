@@ -496,6 +496,7 @@ $(document).ready(() => {
         } else if (data === "BadPass"){
           logMessage = error("Mot de passe incorrect")
         } else if (data === "Valid"){
+          logMessage = success("Vous étes connecté")
           window.location.reload();
         }
         $('#login-response').html(logMessage)
@@ -528,5 +529,11 @@ $(document).ready(() => {
   $('.box').toggle();
   $('#loop').click(() => {
     $('.box').slideToggle(500);
+  })
+})
+
+$(document).ready(() => {
+  $("#closeCookieConsent").on('click', () => {
+    $("#cookieConsent").toggle();
   })
 })

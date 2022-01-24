@@ -9,8 +9,12 @@ const dotenv = require('dotenv');
 const validator = require('validator')
 const pinSender = require('./lib/MailSender')
 const makeId = require('./lib/makeId')
+const surfConsent = require('./lib/surfConsent')
+//sk_test_51JP6pjFvE0ip00kntEbPBs3RpX9eEIcV7BGjl8qur3bLgRzSTjWafKdfKqfmIge9GVUcvFR77hieQ7e73sStpWgH00MBYyGZp1
+const stripe = require('stripe')('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');
 
 const {MongoClient} = require('mongodb');
+var ObjectId = require('mongodb').ObjectID;
 const dbURL = "mongodb+srv://h4r4ld:.feEM5*46pXzFM4@surf.hdzzn.mongodb.net/"
 
 app.engine('html', consolidate.hogan)
@@ -28,7 +32,11 @@ app.use(sessions({
 }))
 
 app.get('/', function(req, res) {
-  res.render('surf.html');
+  if (!req.session.user){
+    res.render('surf.html', {surfConsent: surfConsent()});
+  } else {
+    res.render('surf.html')
+  }
 });
 
 app.post('/getAffs', function(req, res) {
@@ -147,6 +155,68 @@ app.get('/tmpValid', function(req, res){
     })
   }
 })
+
+app.post('/checkout', async function(req, res){
+  MongoClient.connect(dbURL, async function(err, client) {
+    db = client.db("immo-surf").collection("affiches")
+    const affichesOID = new ObjectId();
+    db.insertOne({
+      _id: affichesOID,
+      location: req.body.coord,
+      address: req.body.addr,
+      title: req.body.immob,
+      locvent: req.body.lorv,
+      description: req.body.descr,
+      mail: req.body.descr1,
+      tel: req.body.descr2,
+      prix: req.body.descr0,
+      createdAt: new Date(),
+      pay: false,
+    })
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: [
+        'card',
+        'bancontact',
+        'sofort',
+      ],
+      line_items: [
+        {
+          price: 'price_1JP76UFvE0ip00knGB3izHez',
+          quantity: 1,
+        }
+      ],
+      mode: 'payment',
+      success_url: `https://immo.surf/order/success?session_id={CHECKOUT_SESSION_ID}&afficheID=${affichesOID.toString()}`,
+      cancel_url: 'https://immo.surf',
+    });
+    res.redirect(303, session.url);
+  })
+})
+
+app.get('/order/success', async (req, res) => {
+  const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
+  const customer = await stripe.customers.retrieve(session.customer);
+  if (session.payment_status !== "unpaid"){
+    MongoClient.connect(dbURL, function(err, client) {
+      db = client.db("immo-surf").collection("affiches")
+      db.updateOne({_id: ObjectId(req.query.afficheID)}, { $unset : { createdAt : 1} })
+      res.send(`
+        <html>
+          <body>
+          <h1>Thanks for your order, ${customer.name}!</h1>
+          </body>
+          <script>
+          const bc = new BroadcastChannel('fm86.7');
+
+          bc.postMessage('pay');
+          window.close();
+          </script>
+        </html>`);
+    })
+  } else {
+    res.send(`<html><body><h1>Sorry, ${customer.name}!</h1></body></html>`);
+  }
+});
 
 app.use(express.static('content/static'));
 
