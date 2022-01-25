@@ -10,6 +10,7 @@ const validator = require('validator')
 const pinSender = require('./lib/MailSender')
 const makeId = require('./lib/makeId')
 const surfConsent = require('./lib/surfConsent')
+const profilePage = require('./lib/SurfRender').profile
 //sk_test_51JP6pjFvE0ip00kntEbPBs3RpX9eEIcV7BGjl8qur3bLgRzSTjWafKdfKqfmIge9GVUcvFR77hieQ7e73sStpWgH00MBYyGZp1
 const stripe = require('stripe')('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');
 
@@ -35,7 +36,7 @@ app.get('/', function(req, res) {
   if (!req.session.user){
     res.render('surf.html', {surfConsent: surfConsent()});
   } else {
-    res.render('surf.html')
+    res.render('surf.html', {myProfile: profilePage()})
   }
 });
 

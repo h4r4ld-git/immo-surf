@@ -398,6 +398,16 @@ $(document).ready(() => {
       $("#glob").slideToggle(500);
       $("#popup").slideToggle(500);
       $('#connectionButton').click();
+    } else {
+      var effect = 'slide';
+
+      // Set the options for the effect type chosen
+      var options = { direction: 'right' };
+
+      // Set the duration (default: 400 milliseconds)
+      var duration = 700;
+
+      $('#profile').toggle('drop', {direction: 'right'}, 150)
     }
   })
 })

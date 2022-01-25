@@ -1,0 +1,281 @@
+.profiles-container{
+	height: 900px;
+	display: block;
+	text-align: center;
+	margin: 5px;
+	border-radius: 5px;
+	border-color: #f44336;
+  padding: 10px;
+  box-shadow: rgb(0 0 0 / 24%) 0px 3px 8px;
+	overflow: hidden;
+	background-color: white;
+}
+
+.profiles-list{
+	text-align: center;
+	float:left;
+	display: inline;
+	height: 100%;
+	width: 34%;
+	padding: 5px;
+	padding-right: 0;
+	border-right: 5px solid;
+	border-color: rgb(0 0 0 / 24%);
+}
+
+.profile-button{
+	width: 90%;
+	height: 50px;
+	background-color: white;
+	border-color: white;
+	border: 0px;
+}
+
+.profile-button:hover{
+	transition: All 1s ease;
+	background-color: rgb(0 0 0 / 25%);
+}
+
+.profile-button:focus{
+	background-color: rgb(0 0 0 / 90%);
+	color: white;
+	border-right: 3px solid;
+}
+
+.selected{
+ background-color: rgb(0 0 0 / 90%);
+ color: white;
+ border-right: 3px solid;
+}
+
+.confirm{
+  display: none;
+  visibility: hidden;
+}
+
+.active{
+  background: rgba(0,0,0,0.5);
+  display: block;
+  visibility: visible;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+}
+
+.padding {
+    padding: 3rem !important;
+		width: 50%;
+		height: 400px;
+		margin-left: 25%;
+}
+
+.user-card-full {
+    overflow: hidden
+}
+
+.card {
+    border-radius: 5px;
+    -webkit-box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
+    box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
+    border: none;
+    margin-bottom: 30px
+}
+
+.m-r-0 {
+    margin-right: 0px
+}
+
+.m-l-0 {
+    margin-left: 0px
+}
+
+.user-card-full .user-profile {
+    border-radius: 5px 0 0 5px
+}
+
+.bg-c-lite-green {
+    background: -webkit-gradient(linear, left top, right top, from(#000000), to(#000000));
+    background: linear-gradient(to right, #000000, #000000)
+}
+
+.user-profile {
+    padding: 20px 0
+}
+
+.card-block {
+    padding: 1.25rem;
+		height: 200px;
+}
+
+.m-b-25 {
+    margin-bottom: 25px
+}
+
+.img-radius {
+    border-radius: 5px
+}
+
+h6 {
+    font-size: 14px
+}
+
+.card .card-block p {
+    line-height: 25px
+}
+
+@media only screen and (min-width: 1400px) {
+    p {
+        font-size: 14px
+    }
+}
+
+.card-block {
+    padding: 1.25rem
+}
+
+.b-b-default {
+    border-bottom: 1px solid #e0e0e0
+}
+
+.m-b-20 {
+    margin-bottom: 20px
+}
+
+.p-b-5 {
+    padding-bottom: 5px !important
+}
+
+.card .card-block p {
+    line-height: 25px
+}
+
+.m-b-10 {
+    margin-bottom: 10px
+}
+
+.text-muted {
+    color: #919aa3 !important
+}
+
+.b-b-default {
+    border-bottom: 1px solid #e0e0e0
+}
+
+.f-w-600 {
+    font-weight: 600
+}
+
+.m-b-20 {
+    margin-bottom: 20px
+}
+
+.m-t-40 {
+    margin-top: 20px
+}
+
+.p-b-5 {
+    padding-bottom: 5px !important
+}
+
+.m-b-10 {
+    margin-bottom: 10px
+}
+
+.m-t-40 {
+    margin-top: 20px
+}
+
+.user-card-full .social-link li {
+    display: inline-block
+}
+
+.user-card-full .social-link li a {
+    font-size: 20px;
+    margin: 0 10px 0 0;
+    -webkit-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out
+}
+
+.center{
+    text-align: center;
+
+}
+.form{
+	background-image: url("https://i1.wp.com/beagence.com/wp-content/uploads/2021/07/winterlogo-e1608520348804-2.png");
+	background-repeat: no-repeat;
+	background-position: right top;
+	background-size: 10%;
+  border-radius: 4px;
+  background-color: black;
+  text-align: center
+  padding-top: 50px;
+  padding-bottom: 5px;
+}
+.input1{
+	color : white;
+	font-widget: bold;
+	font-size: 400%;
+	text-align: center;
+	margin-top: 80px;
+  border-radius: 4px;
+  background-color: #FF4F00;
+  height: 130px;
+  width:85%;
+}
+.input2{
+  border-radius: 4px;
+  background-color: white;
+  height: 260px;
+  width:85%;
+}
+input[type="tel"]{
+	padding: 1px;
+  border-radius: 4px;
+  background-color: white;
+  height: 60px;
+  width:28%;
+	font-size:90%;
+}
+input[type="email"]{
+	padding: 1px;
+  border-radius: 4px;
+  background-color: white;
+  height: 60px;
+  width:28%;
+	font-size:90%;
+}
+input[type="number"]{
+	padding: 1px;
+  border-radius: 4px;
+  background-color: white;
+  height: 60px;
+  width:28%;
+	font-size:90%;
+}
+
+.lab3{
+	font-weight: bold;
+  border-radius: 2px;
+  background-color: black;
+  color : #FF4F00;
+  font-size: 400%;
+  width: 100%;
+  height: 140px;
+}
+.scroll {
+   overflow: scroll;
+}
+.scroll::-webkit-scrollbar {
+    width: 12px;
+}
+
+.scroll::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 10px;
+}
+
+.scroll::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+​
