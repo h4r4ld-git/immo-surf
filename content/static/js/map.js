@@ -404,10 +404,10 @@ $(document).ready(() => {
 
 $(document).ready(() => {
   $('#afficheBut').on("click", () => {
-    activate();
     $(document).ready(() => {
       $('#btaffiche').click();
       $('#btaffiche1').click();
+      activate();
     })
   })
 })
@@ -415,9 +415,9 @@ $(document).ready(() => {
 $(document).ready(() => {
   $('#packOneBut').on("click", function() {
     $('#prices').slideToggle();
-    activate();
     $('#btaffiche').click();
     $('#btaffiche1').click();
+    activate();
   })
   $('#packOnePlusBut').on("click", function() {
     $('#prices').slideToggle();
