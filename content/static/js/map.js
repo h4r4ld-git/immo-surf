@@ -396,8 +396,8 @@ $(document).ready(() => {
   $('#profileButton').on("click", () => {
     if ($('#profile').is(':empty')){
       $("#glob").slideToggle(500);
-      $("#popup").slideToggle(500);
       $('#connectionButton').click();
+      $("#popup").slideToggle(500);
     } else {
       var effect = 'slide';
 
@@ -431,13 +431,13 @@ $(document).ready(() => {
   })
   $('#packOnePlusBut').on("click", function() {
     $('#prices').slideToggle();
-    activate();
     $('#connectionButton').click();
+    activate();
   })
   $('#packUnlimitedBut').on("click", function() {
     $('#prices').slideToggle();
-    activate();
     $('#connectionButton').click();
+    activate();
   })
 })
 
@@ -544,6 +544,9 @@ $(document).ready(() => {
 
 $(document).ready(() => {
   $("#closeCookieConsent").on('click', () => {
+    $("#cookieConsent").toggle();
+  })
+  $("#closeCookieConsentBut").click(() => {
     $("#cookieConsent").toggle();
   })
 })
