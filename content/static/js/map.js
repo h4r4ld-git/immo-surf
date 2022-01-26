@@ -399,15 +399,7 @@ $(document).ready(() => {
       $('#connectionButton').click();
       $("#popup").slideToggle(500);
     } else {
-      var effect = 'slide';
-
-      // Set the options for the effect type chosen
-      var options = { direction: 'right' };
-
-      // Set the duration (default: 400 milliseconds)
-      var duration = 700;
-
-      $('#profile').toggle('drop', {direction: 'right'}, 150)
+      $('#profile').toggle('slide', {direction: 'right'}, 1000)
     }
   })
 })
@@ -548,5 +540,11 @@ $(document).ready(() => {
   })
   $("#closeCookieConsentBut").click(() => {
     $("#cookieConsent").toggle();
+  })
+})
+
+$(document).ready(() => {
+  $(".arrow").on("click", () => {
+    $('#profile').toggle('slide', {direction: 'right'}, 1000)
   })
 })

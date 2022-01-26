@@ -36,7 +36,17 @@ app.get('/', function(req, res) {
   if (!req.session.user){
     res.render('surf.html', {surfConsent: surfConsent()});
   } else {
-    res.render('surf.html', {myProfile: profilePage()})
+    MongoClient.connect(dbURL, function(err, client) {
+      affiches = client.db("immo-surf").collection("affiches")
+      users = client.db("immo-surf").collection("users")
+      users.findOne({email: req.session.user.email}, function(err, result){
+        if (result){
+          affiches.find({email: req.session.user.email}).toArray(function(err, affs){
+            res.render('surf.html', {myProfile: profilePage(result, affs)})
+          })
+        }
+      })
+    })
   }
 });
 
