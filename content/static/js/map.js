@@ -436,6 +436,7 @@ $(document).ready(() => {
       $("#glob").slideToggle(500);
       $('#connectionButton').click();
       $("#popup").slideToggle(500);
+      $('#connectionButton').focus();
     } else {
       $('#profile').toggle('slide', {direction: 'right'}, 1000)
       profileInit()
@@ -449,6 +450,8 @@ $(document).ready(() => {
       $('#btaffiche').click();
       $('#btaffiche1').click();
       activate();
+      $('#btaffiche').focus();
+      $('#btaffiche1').focus();
     })
   })
 })
@@ -459,16 +462,20 @@ $(document).ready(() => {
     $('#btaffiche').click();
     $('#btaffiche1').click();
     activate();
+    $('#btaffiche').focus();
+    $('#btaffiche1').focus();
   })
   $('#packOnePlusBut').on("click", function() {
     $('#prices').slideToggle();
     $('#connectionButton').click();
     activate();
+    $('#connectionButton').focus();
   })
   $('#packUnlimitedBut').on("click", function() {
     $('#prices').slideToggle();
     $('#connectionButton').click();
     activate();
+    $('#connectionButton').focus();
   })
 })
 

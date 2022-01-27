@@ -270,6 +270,10 @@ button, .button, input[type="submit"], .a8c-posts-list__view-all, button[data-lo
   background-color: #ddd;
 }
 
+.tab button:focus {
+  background-color: #ddd;
+}
+
 /* Add a active/current tablink class */
 .tab button.active {
   background-color: #ccc;
@@ -301,6 +305,10 @@ button, .button, input[type="submit"], .a8c-posts-list__view-all, button[data-lo
 
 /* Assign colors to the tabs if they are hovered upon */
 .tab1 button:hover {
+  background-color: #ddd;
+}
+
+.tab1 button:focus {
   background-color: #ddd;
 }
 
