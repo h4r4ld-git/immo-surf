@@ -387,10 +387,48 @@ function outR(){
 }
 
 $(document).ready(() => {
-  $('#prices').on('click', () => {
-    $('#prices').toggle();
+  $('#prices').on('click', (e) => {
+
+      var container = $(".services");
+
+      // if the target of the click isn't the container nor a descendant of the container
+      if (!container.is(e.target) && container.has(e.target).length === 0)
+      {
+          $("#prices").toggle()
+      }
+
   })
 })
+var aff;
+function profileInit(){
+  aff = (event) => {
+    $(document).ready(function() {
+      if (!$("#" + event.srcElement.id).is(".selected")){
+        $("div[id^=aff]").each(function(){
+          if($(this).is(':visible'))
+          {
+            $(this).toggle()
+          }
+        })
+        $("input[id^=but]").each(function(){
+          if ($(this).is(".selected")){
+            $(this).removeClass("selected");
+          }
+        })
+
+          $("#" + event.srcElement.id).addClass("selected");
+
+        var source = event.target || event.srcElement;
+        $("[id='aff" + source.name + "']").toggle(100)
+      }
+    })
+
+  }
+  $(document).ready(function(){
+    document.getElementById("del1").disabled = true;
+    document.getElementById("ed1").disabled = true;
+  })
+}
 
 $(document).ready(() => {
   $('#profileButton').on("click", () => {
@@ -400,6 +438,7 @@ $(document).ready(() => {
       $("#popup").slideToggle(500);
     } else {
       $('#profile').toggle('slide', {direction: 'right'}, 1000)
+      profileInit()
     }
   })
 })
@@ -546,5 +585,8 @@ $(document).ready(() => {
 $(document).ready(() => {
   $(".arrow").on("click", () => {
     $('#profile').toggle('slide', {direction: 'right'}, 1000)
+    $('body').css({
+        overflow: 'auto'
+    });
   })
 })
