@@ -415,19 +415,13 @@ function profileInit(){
             $(this).removeClass("selected");
           }
         })
-
-          $("#" + event.srcElement.id).addClass("selected");
-
+        $("#" + event.srcElement.id).addClass("selected");
         var source = event.target || event.srcElement;
         $("[id='aff" + source.name + "']").toggle(100)
       }
     })
 
   }
-  $(document).ready(function(){
-    document.getElementById("del1").disabled = true;
-    document.getElementById("ed1").disabled = true;
-  })
 }
 
 $(document).ready(() => {
@@ -595,5 +589,11 @@ $(document).ready(() => {
     $('body').css({
         overflow: 'auto'
     });
+  })
+})
+
+$(document).ready(() => {
+  $("#tarifsBut").click(() => {
+    $("#prices").toggle(100)
   })
 })

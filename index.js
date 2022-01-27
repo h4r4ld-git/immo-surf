@@ -229,6 +229,30 @@ app.get('/order/success', async (req, res) => {
   }
 });
 
+app.post('/DeleteAff', async (req, res) => {
+  if (req.session.user){
+    MongoClient.connect(dbURL, async function(err, client) {
+      db = client.db("immo-surf").collection("affiches")
+      const result = await db.deleteOne({address: req.body.address, mail: req.session.user.email})
+      res.send("Hi")
+    })
+  } else {
+    res.send(0)
+  }
+})
+
+app.post('/EditAff', async (req, res) => {
+  if (req.session.user){
+    MongoClient.connect(dbURL, async function(err, client) {
+      db = client.db("immo-surf").collection("affiches")
+      const result = await db.updateOne({address: req.body.address, mail: req.session.user.email}, {$set: {title: req.body.title, description: req.body.description, prix: req.body.prix}})
+      res.send("Hi")
+    })
+  } else {
+    res.send(0)
+  }
+})
+
 app.use(express.static('content/static'));
 
 https.createServer({
