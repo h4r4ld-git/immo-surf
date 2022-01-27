@@ -41,7 +41,7 @@ app.get('/', function(req, res) {
       users = client.db("immo-surf").collection("users")
       users.findOne({email: req.session.user.email}, function(err, result){
         if (result){
-          affiches.find({email: req.session.user.email}).toArray(function(err, affs){
+          affiches.find({mail: req.session.user.email}).toArray(function(err, affs){
             res.render('surf.html', {myProfile: profilePage(result, affs)})
           })
         }
