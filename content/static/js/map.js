@@ -386,6 +386,8 @@ function outR(){
   document.getElementById("rooting-container").style.display = "none";
 }
 
+
+
 $(document).ready(() => {
   $('#prices').on('click', (e) => {
 
@@ -423,6 +425,12 @@ function profileInit(){
 
   }
 }
+
+$(document).ready(() => {
+  if ($('#profile').is(':empty')){
+    $("#prices").toggle()
+  }
+})
 
 $(document).ready(() => {
   $('#profileButton').on("click", () => {
@@ -494,7 +502,6 @@ function error(msg) {
 $(document).ready(() => {
   $('#registerBut').click(() => {
     $.post('/register', {
-        "name" : $('#uname').val(),
         "mail" : $('#umail').val(),
         "tel" : $('#utel').val(),
       }, (data) => {
@@ -506,9 +513,11 @@ $(document).ready(() => {
         } else if (data === "Phone"){
           regMessage = error("Votre numéro de GSM n'est pas valide")
         } else if (data === "Found"){
-          regMessage = error("L'adresse email est déja enregistré dans la base. Veuillez indiquer une autre adresse email");
+          regMessage = error(`
+            L'adresse email et le numéro de GSM se trouve déja dans la base.
+            Connectez vous ou indiquez d'autres coordonnées.
+          `);
         } else if (data === "Valid") {
-          $('#uname').val("")
           $('#umail').val("")
           $('#utel').val("")
           regMessage = success("Votre profil à été crée avec succés. Veuillez consulter votre boite email pour récupérer le PIN");

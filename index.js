@@ -39,7 +39,7 @@ app.get('/', function(req, res) {
     MongoClient.connect(dbURL, function(err, client) {
       affiches = client.db("immo-surf").collection("affiches")
       users = client.db("immo-surf").collection("users")
-      users.findOne({email: req.session.user.email}, function(err, result){
+      users.findOne({email: req.session.user.email, tel: req.session.user.tel}, function(err, result){
         if (result){
           affiches.find({mail: req.session.user.email}).toArray(function(err, affs){
             res.render('surf.html', {myProfile: profilePage(result, affs)})
@@ -60,17 +60,16 @@ app.post('/getAffs', function(req, res) {
 })
 
 app.post('/register', function(req, res) {
-  const name = validator.escape(req.body.name).toLowerCase();
   const email = validator.escape(req.body.mail);
   var tel = validator.escape(req.body.tel);
 
-  if (!name || !email || !tel){
+  if (!email || !tel){
     res.send("Empty");
   } else {
     tel = tel.replace(/\D/g, '');
     MongoClient.connect(dbURL, function(err, client) {
       db = client.db("immo-surf").collection("users")
-      db.findOne({"username": name}, function(err, result){
+      db.findOne({"email": email, "tel": tel}, function(err, result){
         if (result){
           res.send("Found")
         } else {
@@ -100,7 +99,7 @@ app.post('/login', function(req, res){
     tel = tel.replace(/\D/g, '');
     MongoClient.connect(dbURL, function(err, client) {
       db = client.db("immo-surf").collection("users")
-      db.findOne({"email": email}, function(err, result){
+      db.findOne({"email": email, "tel": tel}, function(err, result){
         if (!result){
           res.send("NotFound")
         } else {
@@ -110,7 +109,6 @@ app.post('/login', function(req, res){
             res.send("Phone")
           } else if (pin === result.pin){
             req.session.user = {
-              username: result.username,
               email: email,
               tel: tel,
             }

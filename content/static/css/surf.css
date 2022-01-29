@@ -925,6 +925,7 @@ border-bottom:1px solid rgb(25, 31, 34);
 }
 
 #prices{
+  display: none;
   position: fixed;
   z-index: 9000;
   background-color: rgba(0, 0, 0, 0.8);
