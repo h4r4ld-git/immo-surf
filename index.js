@@ -39,10 +39,16 @@ app.get('/', function(req, res) {
     MongoClient.connect(dbURL, function(err, client) {
       affiches = client.db("immo-surf").collection("affiches")
       users = client.db("immo-surf").collection("users")
+      abonnement = client.db("immo-surf").collection("abonnement")
       users.findOne({email: req.session.user.email, tel: req.session.user.tel}, function(err, result){
         if (result){
           affiches.find({mail: req.session.user.email, tel: req.session.user.tel}).toArray(function(err, affs){
-            res.render('surf.html', {myProfile: profilePage(result, affs)})
+            if (affs){
+              abonnement.findOne({userID: req.session.user.userID}, function(err, result1){
+                res.render('surf.html', {myProfile: profilePage(result, affs, result1)})
+              })
+            }
+
           })
         }
       })
@@ -79,7 +85,10 @@ app.post('/register', function(req, res) {
             res.send("Phone")
           } else {
             const id = pinSender.send(email);
-            db.insertOne({"name": name, "email": email, "tel": tel, "pin": id});
+            const userId = new ObjectId();
+            db.insertOne({"_id": userId, "name": "Surfer", "email": email, "tel": tel, "pin": id});
+            db = client.db("immo-surf").collection("abonnement")
+            db.insertOne({"userID": userId, "abonnement": "One"})
             res.send("Valid")
           }
         }
@@ -109,6 +118,8 @@ app.post('/login', function(req, res){
             res.send("Phone")
           } else if (pin === result.pin){
             req.session.user = {
+              userID: result.userID,
+              name: result.name,
               email: email,
               tel: tel,
             }

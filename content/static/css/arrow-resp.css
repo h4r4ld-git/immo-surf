@@ -3,7 +3,7 @@
 	 height: 120px;
 	 left: 50%;
 	 position: relative;
-	 top: 33%;
+	 top: 50%;
 	 transform: translateX(-50%) translateY(-50%);
 	 transition: transform 0.1s;
 	 width: 80px;

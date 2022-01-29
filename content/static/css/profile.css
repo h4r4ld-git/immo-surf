@@ -1,5 +1,36 @@
-.profiles-container{
-	height: 900px;
+.full-height{
+	height: 100%;
+}
+
+#tabs{
+	text-align: center;
+}
+
+#tabs button{
+	font-size: 14px;
+	color: white;
+	background-color: grey;
+	width: 20%;
+}
+
+#tabs button:hover{
+	background-color: black;
+	color: white;
+}
+#tabs button:focus{
+	background-color: black;
+	color: white;
+}
+
+.ui-widget-header {
+	 background:#b9cd6d;
+	 border: 1px solid #b9cd6d;
+	 color: #FFFFFF;
+	 font-weight: bold;
+}
+
+.profiles-container-head{
+	height: 90%;
 	display: block;
 	text-align: center;
 	margin: 5px;
@@ -8,6 +39,20 @@
   padding: 10px;
   box-shadow: rgb(0 0 0 / 24%) 0px 3px 8px;
 	overflow: hidden;
+	background-color: white;
+}
+
+.profiles-container{
+	height: 90%;
+	display: block;
+	text-align: center;
+	margin: 5px;
+	border-radius: 5px;
+	border-color: #f44336;
+  padding: 10px;
+  box-shadow: rgb(0 0 0 / 24%) 0px 3px 8px;
+	overflow-x: hidden;
+	overflow-y: scroll;
 	background-color: white;
 }
 
@@ -63,9 +108,7 @@
 }
 
 .padding {
-    padding: 3rem !important;
 		width: 50%;
-		height: 400px;
 		margin-left: 25%;
 }
 
@@ -78,7 +121,6 @@
     -webkit-box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
     box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
     border: none;
-    margin-bottom: 30px
 }
 
 .m-r-0 {
@@ -99,7 +141,7 @@
 }
 
 .user-profile {
-    padding: 20px 0
+    padding: 20px 0;
 }
 
 .card-block {
