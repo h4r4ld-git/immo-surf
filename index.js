@@ -47,9 +47,13 @@ app.get('/', function(req, res) {
           affiches.find({mail: req.session.user.email, tel: req.session.user.tel}).toArray(function(err, affs){
             if (affs){
               abonnement.findOne({userID: req.session.user.userID, status: "active"}, function(err, result1){
-                prices.findOne({prod: result1.sub}, function(err, result2){
-                  res.render('surf.html', {myProfile: profilePage(result, affs, result2)})
-                })
+                if (result1){
+                  prices.findOne({prod: result1.sub}, function(err, result2){
+                    res.render('surf.html', {myProfile: profilePage(result, affs, result2)})
+                  })
+                } else {
+                  res.render('surf.html', {myProfile: profilePage(result, affs, result1)})
+                }
               })
             }
 
