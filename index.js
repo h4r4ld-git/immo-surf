@@ -216,7 +216,7 @@ app.post('/checkout', async function(req, res){
 
 app.post('/checkout-subscription', async (req, res) => {
   if (req.session.user && req.body.newSub !== "None"){
-    MongoClient.connect(dbURL, function(err, client){
+    MongoClient.connect(dbURL, async function(err, client){
       db = client.db("immo-surf").collection("abonnement")
       var price;
       if (req.body.newSub === "OnePlus"){
