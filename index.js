@@ -233,6 +233,7 @@ app.post('/checkout-subscription', async (req, res) => {
       success_url: `https://immo.surf`,
       cancel_url: 'https://immo.surf',
     });
+    console.log(session.id)
     res.redirect(303, session.url);
   } else {
     res.redirect('/')
@@ -278,7 +279,7 @@ app.post('/webhook-subscriptions', bodyParser.raw({type: 'application/json'}), (
 
   var invoice;
   switch (event.type) {
-   case 'invoice.paid':
+   case 'invoice.payment_succeeded':
      invoice = event.data.object;
      console.log(invoice)
      // Then define and call a function to handle the event invoice.paid
