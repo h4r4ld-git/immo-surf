@@ -330,7 +330,8 @@ app.post('/webhook-subscriptions', bodyParser.raw({type: 'application/json'}), a
        })
        break;
      case 'invoice.payment_succeeded':
-       db.updateOne({subID: data.data.object.lines.data[0].subscription}, {$set: {atYear: new Date()}})
+       console.log(data)
+       //db.updateOne({subID: data.data.object.lines.data[0].subscription}, {$set: {atYear: new Date()}})
        break;
      case 'invoice.payment_failed':
        db.deleteOne({subID: data.data.object.lines.data[0].subscription})
