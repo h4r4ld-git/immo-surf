@@ -119,7 +119,7 @@ app.post('/login', function(req, res){
             res.send("Phone")
           } else if (pin === result.pin){
             req.session.user = {
-              userID: result.userID,
+              userID: result._id.toString(),
               name: result.name,
               email: email,
               tel: tel,
