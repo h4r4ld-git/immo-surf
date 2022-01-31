@@ -273,7 +273,7 @@ app.get('/affiche/order/success', async (req, res) => {
     res.send(`<html><body><h1>Sorry, ${customer.name}!</h1></body></html>`);
   }
 });
-app.post('/webhook-subscriptions', bodyParser.raw({type: 'application/json'}), (request, response) => {
+app.post('/webhook-subscriptions', bodyParser.raw({type: 'application/json'}), (req, res) => {
   const webhookSecret = "whsec_i3BYrDTBLj9wjYUM09NomUCkxsyIJ8rd";
   let data;
   let eventType;
@@ -298,7 +298,7 @@ app.post('/webhook-subscriptions', bodyParser.raw({type: 'application/json'}), (
     eventType = event.type;
   } else {
     // Webhook signing is recommended, but if the secret is not configured in `config.js`,
-    // retrieve the event data directly from the request body.
+    // retrieve the event data directly from the req body.
     data = req.body.data;
     eventType = req.body.type;
   }
@@ -319,8 +319,8 @@ app.post('/webhook-subscriptions', bodyParser.raw({type: 'application/json'}), (
      console.log(`Unhandled event type ${event.type}`);
  }
 
-  // Return a response to acknowledge receipt of the event
-  response.send();
+  // Return a res to acknowledge receipt of the event
+  res.send();
 });
 
 app.post('/DeleteAff', async (req, res) => {
