@@ -308,8 +308,8 @@ app.post('/webhook-subscriptions', bodyParser.raw({type: 'application/json'}), a
        await db.findOne({checkoutID: data.object.id}, async function(err, result){
          if (result){
            await db.update({userID: result.userID}, {$set: {status: "inactive"}})
-           await db.find({userID: result.userID, status: "inactive", canceled: false}).toArray(function(err, subs){
-             subs.forEach(function(sub, index){
+           await db.find({userID: result.userID, status: "inactive", canceled: false}).toArray(async function(err, subs){
+             subs.forEach(async function(sub, index){
                const deleted = await stripe.subscriptions.del(
                  sub.subID
                );
