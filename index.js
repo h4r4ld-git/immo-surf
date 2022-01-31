@@ -263,7 +263,7 @@ app.get('/affiche/order/success', async (req, res) => {
     res.send(`<html><body><h1>Sorry, ${customer.name}!</h1></body></html>`);
   }
 });
-
+const endpointSecret = "whsec_4NyYqnQZKcxAgS0CJP7gzyn6JKpik2yY";
 app.post('/webhook-subscriptions', express.json({type: 'application/json'}), (request, response) => {
   const sig = request.headers['stripe-signature'];
 
