@@ -216,25 +216,34 @@ app.post('/checkout', async function(req, res){
 
 app.post('/checkout-subscription', async (req, res) => {
   if (req.session.user && req.body.newSub !== "None"){
-    var price;
-    if (req.body.newSub === "OnePlus"){
-      price = "price_1KO0DNFvE0ip00knlr61pD5j";
-    } else if (req.body.newSub === "Limitless"){
-      price = "price_1KO2cBFvE0ip00knPNwmhHo7";
-    }
-    const session = await stripe.checkout.sessions.create({
-      line_items: [
-        {
-          price: "price_1KO3IFFvE0ip00knEM1ePthJ",
-          quantity: 1,
+    MongoClient.connect(dbURL, function(err, client){
+      db = client.db("immo-surf").collection("abonnement")
+      var price;
+      if (req.body.newSub === "OnePlus"){
+        price = "price_1KO0DNFvE0ip00knlr61pD5j";
+      } else if (req.body.newSub === "Limitless"){
+        price = "price_1KO2cBFvE0ip00knPNwmhHo7";
+      }
+      const session = await stripe.checkout.sessions.create({
+        line_items: [
+          {
+            price: "price_1KO3IFFvE0ip00knEM1ePthJ",
+            quantity: 1,
+          }
+        ],
+        mode: 'subscription',
+        success_url: `https://immo.surf`,
+        cancel_url: 'https://immo.surf',
+      });
+      db.findOne({userID: req.session.user.userID}, async function(err, result){
+        if (!result){
+          await db.insertOne({userID: req.session.user.userID, checkoutID: session.id})
+        } else {
+          await db.updateOne({userID: req.session.user.userID}, {$set: {checkoutID: session.id}})
         }
-      ],
-      mode: 'subscription',
-      success_url: `https://immo.surf`,
-      cancel_url: 'https://immo.surf',
-    });
-    console.log(session.id)
-    res.redirect(303, session.url);
+        res.redirect(303, session.url);
+      })
+    })
   } else {
     res.redirect('/')
   }
@@ -265,28 +274,44 @@ app.get('/affiche/order/success', async (req, res) => {
   }
 });
 app.post('/webhook-subscriptions', bodyParser.raw({type: 'application/json'}), (request, response) => {
-  const endpointSecret = "whsec_i3BYrDTBLj9wjYUM09NomUCkxsyIJ8rd";
-  const sig = request.headers['stripe-signature'];
+  const webhookSecret = "whsec_i3BYrDTBLj9wjYUM09NomUCkxsyIJ8rd";
+  let data;
+  let eventType;
 
-  let event;
+  if (webhookSecret) {
+    // Retrieve the event by verifying the signature using the raw body and secret.
+    let event;
+    let signature = req.headers["stripe-signature"];
 
-  try {
-    event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
-  } catch (err) {
-    response.status(400).send(`Webhook Error: ${err.message}`);
-    return;
+    try {
+      event = stripe.webhooks.constructEvent(
+        req.body,
+        signature,
+        webhookSecret
+      );
+    } catch (err) {
+      console.log(`⚠️  Webhook signature verification failed.`);
+      return res.sendStatus(400);
+    }
+    // Extract the object from the event.
+    data = event.data;
+    eventType = event.type;
+  } else {
+    // Webhook signing is recommended, but if the secret is not configured in `config.js`,
+    // retrieve the event data directly from the request body.
+    data = req.body.data;
+    eventType = req.body.type;
   }
 
   var invoice;
-  switch (event.type) {
+  switch (eventType) {
+   case 'checkout.session.completed':
+     console.log(data);
+     break;
    case 'invoice.payment_succeeded':
-     invoice = event.data.object;
-     console.log(invoice)
      // Then define and call a function to handle the event invoice.paid
      break;
    case 'invoice.payment_failed':
-     invoice = event.data.object;
-     console.log(invoice)
      // Then define and call a function to handle the event invoice.payment_failed
      break;
    // ... handle other event types
