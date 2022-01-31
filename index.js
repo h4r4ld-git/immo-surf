@@ -237,9 +237,11 @@ app.post('/checkout-subscription', async (req, res) => {
       });
       db.findOne({userID: req.session.user.userID}, async function(err, result){
         if (!result){
-          await db.insertOne({userID: req.session.user.userID, checkoutID: session.id})
-        } else {
+          await db.insertOne({userID: req.session.user.userID, checkoutID: session.id, status: "inactive"})
+        } else if (!result.subID) {
           await db.updateOne({userID: req.session.user.userID}, {$set: {checkoutID: session.id}})
+        } else {
+          await db.insertOne({userID: req.session.user.userID, checkoutID: session.id, status: "inactive"})
         }
         res.redirect(303, session.url);
       })
@@ -273,13 +275,12 @@ app.get('/affiche/order/success', async (req, res) => {
     res.send(`<html><body><h1>Sorry, ${customer.name}!</h1></body></html>`);
   }
 });
-app.post('/webhook-subscriptions', bodyParser.raw({type: 'application/json'}), (req, res) => {
+app.post('/webhook-subscriptions', bodyParser.raw({type: 'application/json'}), async (req, res) => {
   const webhookSecret = "whsec_i3BYrDTBLj9wjYUM09NomUCkxsyIJ8rd";
   let data;
   let eventType;
 
   if (webhookSecret) {
-    // Retrieve the event by verifying the signature using the raw body and secret.
     let event;
     let signature = req.headers["stripe-signature"];
 
@@ -293,33 +294,52 @@ app.post('/webhook-subscriptions', bodyParser.raw({type: 'application/json'}), (
       console.log(`⚠️  Webhook signature verification failed.`);
       return res.sendStatus(400);
     }
-    // Extract the object from the event.
     data = event.data;
     eventType = event.type;
   } else {
-    // Webhook signing is recommended, but if the secret is not configured in `config.js`,
-    // retrieve the event data directly from the req body.
     data = req.body.data;
     eventType = req.body.type;
   }
 
-  var invoice;
-  switch (eventType) {
-   case 'checkout.session.completed':
-     console.log(data);
-     break;
-   case 'invoice.payment_succeeded':
-     // Then define and call a function to handle the event invoice.paid
-     break;
-   case 'invoice.payment_failed':
-     // Then define and call a function to handle the event invoice.payment_failed
-     break;
-   // ... handle other event types
-   default:
-     console.log(`Unhandled event type ${event.type}`);
- }
+  MongoClient.connect(dbURL, async function(err, client){
+    db = client.db("immo-surf").collection("abonnement")
+    switch (eventType) {
+     case 'checkout.session.completed':
+       await db.findOne({checkoutID: data.object.id}, async function(err, result){
+         if (result){
+           await db.update({userID: result.userID}, {$set: {status: "inactive"}})
+           await db.find({userID: result.userID, status: "inactive", canceled: false}).toArray(function(err, subs){
+             subs.forEach(function(sub, index){
+               const deleted = await stripe.subscriptions.del(
+                 sub.subID
+               );
+             })
+           })
+           const subscription = await stripe.subscriptions.retrieve(
+             data.object.subscription
+           );
+           db.updateOne({checkoutID: data.object.id, userID: result.userID}, {$set: {
+             status: "active",
+             canceled: false,
+             atYear: new Date(),
+             sub: subscription.items.data[0].price.product,
+             subID: data.object.subscription,
+             affs: 0
+           }})
+         }
+       })
+       break;
+     case 'invoice.payment_succeeded':
+       db.updateOne({subID: data.data.object.lines.data[0].subscription}, {$set: {atYear: new Date()}})
+       break;
+     case 'invoice.payment_failed':
+       db.deleteOne({subID: data.data.object.lines.data[0].subscription})
+       break;
+     default:
+       console.log(`Unhandled event type ${event.type}`);
+   }
+  })
 
-  // Return a res to acknowledge receipt of the event
   res.send();
 });
 
