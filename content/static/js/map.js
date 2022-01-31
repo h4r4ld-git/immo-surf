@@ -208,7 +208,6 @@ function fillInAddress1() {
   // which are documented at http://goo.gle/3l5i5Mr
   for (const component of place.address_components) {
     const componentType = component.types[0];
-    console.log(componentType);
     switch (componentType) {
       case "locality": {
         address1 = `${address1} ${component.long_name}`;
@@ -279,49 +278,49 @@ $(function() {
     $(document).ready(function(){
       $.post("/getAffs", function(data){
         const affs = data;
-        Object.keys(affs).forEach(function(key) {
-            var accepted = true;
-            const locvent = affs[key].locvent;
-            if (!document.getElementById("loc").hasAttribute("selected")){
-              if (affs[key].locvent == "Louer"){
-                accepted = false;
+        var coord = $.get('https://nominatim.openstreetmap.org/search?format=json&q='+initAddr, function(data) {
+          Object.keys(affs).forEach(function(key) {
+              var accepted = true;
+              const locvent = affs[key].locvent;
+              if (!document.getElementById("loc").hasAttribute("selected")){
+                if (affs[key].locvent == "Louer"){
+                  accepted = false;
+                }
               }
-            }
-            if (!document.getElementById("vente").hasAttribute("selected")){
-              if (affs[key].locvent == "Vendre"){
-                accepted = false;
+              if (!document.getElementById("vente").hasAttribute("selected")){
+                if (affs[key].locvent == "Vendre"){
+                  accepted = false;
+                }
               }
-            }
-            if (document.getElementById("Biens").value != ""){
-              if (document.getElementById("Biens").value != affs[key].title){
-                accepted = false;
+              if (document.getElementById("Biens").value != ""){
+                if (document.getElementById("Biens").value != affs[key].title){
+                  accepted = false;
+                }
               }
-            }
-            if (document.getElementById("Prix-min").value != ""){
-              if ((document.getElementById("Prix-min").value - affs[key].prix) > 0){
-                accepted = false;
+              if (document.getElementById("Prix-min").value != ""){
+                if ((document.getElementById("Prix-min").value - affs[key].prix) > 0){
+                  accepted = false;
+                }
               }
-            }
-            if (document.getElementById("Prix-max").value != ""){
-              if ((document.getElementById("Prix-max").value - affs[key].prix) < 0){
-                accepted = false;
+              if (document.getElementById("Prix-max").value != ""){
+                if ((document.getElementById("Prix-max").value - affs[key].prix) < 0){
+                  accepted = false;
+                }
               }
-            }
-            if (document.getElementById("addr1").value != ""){
-              var coord = $.get('https://nominatim.openstreetmap.org/search?format=json&q='+initAddr, function(data) {
-                var marker = L.marker([data["0"]["lat"], data["0"]["lon"]]);
-                var marker1 = L.marker([key.split(",")[0], key.split(",")[1]])
+              if (document.getElementById("addr1").value != ""){
+                var marker = L.marker([data["0"].lat, data["0"].lon]);
+                var marker1 = L.marker([affs[key].location.split(",")[0], affs[key].location.split(",")[1]])
                 if ((marker.getLatLng().distanceTo(marker1.getLatLng()).toFixed(0)/1000) > document.getElementById("distance").value){
                   accepted = false;
                 }
                 if (accepted){
-                  Madder(data[key].location, data[key].title, data[key].description, data[key].mail, data[key].tel, data[key].prix, data[key].address);
+                  Madder(affs[key].location, affs[key].title, affs[key].description, affs[key].mail, affs[key].tel, affs[key].prix, affs[key].address);
                 }
-              });
-            } else if (accepted) {
-              Madder(data[key].location, data[key].title, data[key].description, data[key].mail, data[key].tel, data[key].prix, data[key].address);
-            }
-          })
+              } else if (accepted) {
+                Madder(affs[key].location, affs[key].title, affs[key].description, affs[key].mail, affs[key].tel, affs[key].prix, affs[key].address);
+              }
+            })
+          });
         }
       )
     });

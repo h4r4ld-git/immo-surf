@@ -11,8 +11,9 @@ const pinSender = require('./lib/MailSender')
 const makeId = require('./lib/makeId')
 const surfConsent = require('./lib/surfConsent')
 const profilePage = require('./lib/SurfRender').profile
-//sk_test_51JP6pjFvE0ip00kntEbPBs3RpX9eEIcV7BGjl8qur3bLgRzSTjWafKdfKqfmIge9GVUcvFR77hieQ7e73sStpWgH00MBYyGZp1
-const stripe = require('stripe')('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');
+
+//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
+const stripe = require('stripe')('sk_test_51JP6pjFvE0ip00kntEbPBs3RpX9eEIcV7BGjl8qur3bLgRzSTjWafKdfKqfmIge9GVUcvFR77hieQ7e73sStpWgH00MBYyGZp1');
 
 const {MongoClient} = require('mongodb');
 var ObjectId = require('mongodb').ObjectID;
@@ -206,14 +207,39 @@ app.post('/checkout', async function(req, res){
         }
       ],
       mode: 'payment',
-      success_url: `https://immo.surf/order/success?session_id={CHECKOUT_SESSION_ID}&afficheID=${affichesOID.toString()}`,
+      success_url: `https://immo.surf/affiche/order/success?session_id={CHECKOUT_SESSION_ID}&afficheID=${affichesOID.toString()}`,
       cancel_url: 'https://immo.surf',
     });
     res.redirect(303, session.url);
   })
 })
 
-app.get('/order/success', async (req, res) => {
+app.post('/checkout-subscription', async (req, res) => {
+  if (req.session.user && req.body.newSub !== "None"){
+    var price;
+    if (req.body.newSub === "OnePlus"){
+      price = "price_1KO0DNFvE0ip00knlr61pD5j";
+    } else if (req.body.newSub === "Limitless"){
+      price = "price_1KO2cBFvE0ip00knPNwmhHo7";
+    }
+    const session = await stripe.checkout.sessions.create({
+      line_items: [
+        {
+          price: "price_1KO3IFFvE0ip00knEM1ePthJ",
+          quantity: 1,
+        }
+      ],
+      mode: 'subscription',
+      success_url: `https://immo.surf`,
+      cancel_url: 'https://immo.surf',
+    });
+    res.redirect(303, session.url);
+  } else {
+    res.redirect('/')
+  }
+})
+
+app.get('/affiche/order/success', async (req, res) => {
   const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
   const customer = await stripe.customers.retrieve(session.customer);
   if (session.payment_status !== "unpaid"){
@@ -236,6 +262,39 @@ app.get('/order/success', async (req, res) => {
   } else {
     res.send(`<html><body><h1>Sorry, ${customer.name}!</h1></body></html>`);
   }
+});
+
+app.post('/webhook-subscriptions', express.json({type: 'application/json'}), (request, response) => {
+  const sig = request.headers['stripe-signature'];
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+  } catch (err) {
+    response.status(400).send(`Webhook Error: ${err.message}`);
+    return;
+  }
+
+  var invoice;
+  switch (event.type) {
+   case 'invoice.paid':
+     invoice = event.data.object;
+     console.log(invoice)
+     // Then define and call a function to handle the event invoice.paid
+     break;
+   case 'invoice.payment_failed':
+     invoice = event.data.object;
+     console.log(invoice)
+     // Then define and call a function to handle the event invoice.payment_failed
+     break;
+   // ... handle other event types
+   default:
+     console.log(`Unhandled event type ${event.type}`);
+ }
+
+  // Return a response to acknowledge receipt of the event
+  response.send();
 });
 
 app.post('/DeleteAff', async (req, res) => {
