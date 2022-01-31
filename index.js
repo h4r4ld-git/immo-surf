@@ -41,12 +41,15 @@ app.get('/', function(req, res) {
       affiches = client.db("immo-surf").collection("affiches")
       users = client.db("immo-surf").collection("users")
       abonnement = client.db("immo-surf").collection("abonnement")
+      prices = client.db("immo-surf").collection("prices")
       users.findOne({email: req.session.user.email, tel: req.session.user.tel}, function(err, result){
         if (result){
           affiches.find({mail: req.session.user.email, tel: req.session.user.tel}).toArray(function(err, affs){
             if (affs){
-              abonnement.findOne({userID: req.session.user.userID}, function(err, result1){
-                res.render('surf.html', {myProfile: profilePage(result, affs, result1)})
+              abonnement.findOne({userID: req.session.user.userID, status: "active"}, function(err, result1){
+                prices.findOne({prod: result1.sub}, function(err, result2){
+                  res.render('surf.html', {myProfile: profilePage(result, affs, result2)})
+                })
               })
             }
 
@@ -315,6 +318,7 @@ app.post('/webhook-subscriptions', bodyParser.raw({type: 'application/json'}), a
                );
              })
            })
+           await db.update({userID: result.userID, status: "inactive", canceled: false}, {$set: {canceled: true}})
            const subscription = await stripe.subscriptions.retrieve(
              data.object.subscription
            );
@@ -330,8 +334,7 @@ app.post('/webhook-subscriptions', bodyParser.raw({type: 'application/json'}), a
        })
        break;
      case 'invoice.payment_succeeded':
-       console.log(data)
-       //db.updateOne({subID: data.data.object.lines.data[0].subscription}, {$set: {atYear: new Date()}})
+       db.updateOne({subID: data.object.subscription}, {$set: {atYear: new Date()}})
        break;
      case 'invoice.payment_failed':
        db.deleteOne({subID: data.data.object.lines.data[0].subscription})
