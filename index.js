@@ -264,16 +264,19 @@ app.post('/checkout-subscription', async (req, res) => {
       })
     })
   } else {
-    await db.update({userID: req.session.user.userID}, {$set: {status: "inactive"}})
-    await db.find({userID: req.session.user.userID, status: "inactive", canceled: false}).toArray(async function(err, subs){
-      subs.forEach(async function(sub, index){
-        const deleted = await stripe.subscriptions.del(
-          sub.subID
-        );
+    MongoClient.connect(dbURL, async function(err, client){
+      db = client.db("immo-surf").collection("abonnement")
+      await db.update({userID: req.session.user.userID}, {$set: {status: "inactive"}})
+      await db.find({userID: req.session.user.userID, status: "inactive", canceled: false}).toArray(async function(err, subs){
+        subs.forEach(async function(sub, index){
+          const deleted = await stripe.subscriptions.del(
+            sub.subID
+          );
+        })
       })
+      await db.update({userID: req.session.user.userID, status: "inactive", canceled: false}, {$set: {canceled: true}})
+      res.redirect('/')
     })
-    await db.update({userID: req.session.user.userID, status: "inactive", canceled: false}, {$set: {canceled: true}})
-    res.redirect('/')
   }
 })
 
