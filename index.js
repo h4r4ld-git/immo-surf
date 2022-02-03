@@ -239,7 +239,7 @@ app.post('/checkout-subscription', async (req, res) => {
       if (req.body.newSub === "OnePlus"){
         price = OnePlusTest;
       } else if (req.body.newSub === "Limitless"){
-        price = Limitless;
+        price = LimitlessTest;
       }
       const session = await stripe.checkout.sessions.create({
         line_items: [
