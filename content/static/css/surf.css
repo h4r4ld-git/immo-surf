@@ -1005,3 +1005,14 @@ border-bottom:1px solid rgb(25, 31, 34);
   color: #FF4F00;
   font-family: arial;
 }
+
+#addAff {
+  border-radius: 4px;
+  width: 100%;
+}
+
+#newUserAdd {
+  border-radius: 4px;
+  width: 50%;
+  margin: 0;
+}

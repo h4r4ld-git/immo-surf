@@ -10,7 +10,6 @@ $(document).ready(async () => {
           $('#'+ t + 'C').insertAfter('#' + $(this).attr('id') + 'C');
         }
       })
-      console.log('#'+ t + 'C')
     }
   });
 })

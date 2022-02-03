@@ -11,9 +11,17 @@ const pinSender = require('./lib/MailSender')
 const makeId = require('./lib/makeId')
 const surfConsent = require('./lib/surfConsent')
 const profilePage = require('./lib/SurfRender').profile
+const cron = require("node-cron");
 
 //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
 const stripe = require('stripe')('sk_test_51JP6pjFvE0ip00kntEbPBs3RpX9eEIcV7BGjl8qur3bLgRzSTjWafKdfKqfmIge9GVUcvFR77hieQ7e73sStpWgH00MBYyGZp1');
+
+const OnePlus = "price_1KO0DNFvE0ip00knlr61pD5j"
+const Limitless = "price_1KO2cBFvE0ip00knPNwmhHo7"
+const OnePlusTest = "price_1KO3IFFvE0ip00knEM1ePthJ"
+const LimitlessTest = "price_1KPDk6FvE0ip00knBMv5haG6"
+const webhookSecretTest = "whsec_i3BYrDTBLj9wjYUM09NomUCkxsyIJ8rd"
+const webhookSecret = "whsec_MDkZqzxMwxZCF8hz4UNQj0HDKpHnGuZi"
 
 const {MongoClient} = require('mongodb');
 var ObjectId = require('mongodb').ObjectID;
@@ -33,6 +41,14 @@ app.use(sessions({
     }
 }))
 
+
+cron.schedule("* * 1 * *", function() {
+  MongoClient.connect(dbURL, function(err, client){
+    abonnement = client.db("immo-surf").collection("abonnement")
+    abonnement.update({name: "Limitless", affExpire: 5}, {$set: {affs: 18}})
+  })
+});
+
 app.get('/', function(req, res) {
   if (!req.session.user){
     res.render('surf.html', {surfConsent: surfConsent()});
@@ -47,13 +63,7 @@ app.get('/', function(req, res) {
           affiches.find({mail: req.session.user.email, tel: req.session.user.tel}).toArray(function(err, affs){
             if (affs){
               abonnement.findOne({userID: req.session.user.userID, status: "active"}, function(err, result1){
-                if (result1){
-                  prices.findOne({prod: result1.sub}, function(err, result2){
-                    res.render('surf.html', {myProfile: profilePage(result, affs, result2)})
-                  })
-                } else {
-                  res.render('surf.html', {myProfile: profilePage(result, affs, result1)})
-                }
+                res.render('surf.html', {myProfile: profilePage(result, affs, result1)})
               })
             }
 
@@ -227,14 +237,14 @@ app.post('/checkout-subscription', async (req, res) => {
       db = client.db("immo-surf").collection("abonnement")
       var price;
       if (req.body.newSub === "OnePlus"){
-        price = "price_1KO0DNFvE0ip00knlr61pD5j";
+        price = OnePlusTest;
       } else if (req.body.newSub === "Limitless"){
-        price = "price_1KO2cBFvE0ip00knPNwmhHo7";
+        price = Limitless;
       }
       const session = await stripe.checkout.sessions.create({
         line_items: [
           {
-            price: "price_1KO3IFFvE0ip00knEM1ePthJ",
+            price: price,
             quantity: 1,
           }
         ],
@@ -283,11 +293,10 @@ app.get('/affiche/order/success', async (req, res) => {
   }
 });
 app.post('/webhook-subscriptions', bodyParser.raw({type: 'application/json'}), async (req, res) => {
-  const webhookSecret = "whsec_i3BYrDTBLj9wjYUM09NomUCkxsyIJ8rd";
   let data;
   let eventType;
 
-  if (webhookSecret) {
+  if (webhookSecretTest) {
     let event;
     let signature = req.headers["stripe-signature"];
 
@@ -295,7 +304,7 @@ app.post('/webhook-subscriptions', bodyParser.raw({type: 'application/json'}), a
       event = stripe.webhooks.constructEvent(
         req.body,
         signature,
-        webhookSecret
+        webhookSecretTest
       );
     } catch (err) {
       console.log(`⚠️  Webhook signature verification failed.`);
@@ -326,14 +335,18 @@ app.post('/webhook-subscriptions', bodyParser.raw({type: 'application/json'}), a
            const subscription = await stripe.subscriptions.retrieve(
              data.object.subscription
            );
-           db.updateOne({checkoutID: data.object.id, userID: result.userID}, {$set: {
-             status: "active",
-             canceled: false,
-             atYear: new Date(),
-             sub: subscription.items.data[0].price.product,
-             subID: data.object.subscription,
-             affs: 0
-           }})
+           prices.findOne({prod: subscription.items.data[0].price.product}, function(err, result2){
+             db.updateOne({checkoutID: data.object.id, userID: result.userID}, {$set: {
+               name: result2.name,
+               affExpire: result2.affExpire,
+               status: "active",
+               canceled: false,
+               atYear: new Date(),
+               sub: subscription.items.data[0].price.product,
+               subID: data.object.subscription,
+               affs: result2.affs
+             }})
+           })
          }
        })
        break;
