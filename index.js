@@ -60,10 +60,12 @@ app.get('/', function(req, res) {
       prices = client.db("immo-surf").collection("prices")
       users.findOne({email: req.session.user.email, tel: req.session.user.tel}, function(err, result){
         if (result){
-          affiches.find({mail: req.session.user.email, tel: req.session.user.tel}).toArray(function(err, affs){
+          affiches.find({$or: [{mail: req.session.user.email, tel: req.session.user.tel}, {userIDs: req.session.user.userID}]}).toArray(function(err, affs){
             if (affs){
               abonnement.findOne({userID: req.session.user.userID, status: "active"}, function(err, result1){
-                res.render('surf.html', {myProfile: profilePage(result, affs, result1)})
+                abonnement.find({userID: req.session.user.userID}).toArray(function(err, result2){
+                  res.render('surf.html', {myProfile: profilePage(result, affs, result1, result2)})
+                })
               })
             }
 
@@ -397,6 +399,66 @@ app.post('/EditAff', async (req, res) => {
     })
   } else {
     res.send(0)
+  }
+})
+
+app.post('/newAffSub', async (req, res) => {
+  const addr = validator.escape(req.body.addr)
+  const mail = validator.escape(req.body.mail)
+  const tel = validator.escape(req.body.tel)
+  const prix = validator.escape(req.body.prix)
+  const description = validator.escape(req.body.description)
+  const locvent = validator.escape(req.body.locvent)
+  const titre = validator.escape(req.body.titre)
+  const affLoc = validator.escape(req.body.affLoc)
+  const affID = new ObjectId();
+
+  if (req.session.user){
+    MongoClient.connect(dbURL, async function(err, client) {
+      abonnement = client.db("immo-surf").collection("abonnement")
+      affiches = client.db("immo-surf").collection("affiches")
+      abonnement.findOne({subID: req.body.subID, userID: req.session.user.userID}, async function(err, result){
+        if (result){
+          if (result.affs > 0){
+            if (result.affExpire == 5){
+              await affiches.insertOne({
+                userIDs: [req.session.user.userID],
+                location: affLoc,
+                address: addr,
+                title: titre,
+                locvent: locvent,
+                description: description,
+                mail: mail,
+                tel: tel,
+                prix: prix,
+                FiveMonth: new Date()
+              })
+            } else {
+              await affiches.insertOne({
+                userIDs: [req.session.user.userID],
+                location: affLoc,
+                address: addr,
+                title: titre,
+                locvent: locvent,
+                description: description,
+                mail: mail,
+                tel: tel,
+                prix: prix,
+                FourMonth: new Date()
+              })
+            }
+            abonnement.updateOne({subID: req.body.subID, userID: req.session.user.userID}, {$set : {affs: (result.affs - 1)}})
+            res.redirect('/')
+          } else {
+            res.redirect('/')
+          }
+        } else {
+          res.redirect('/')
+        }
+      })
+    })
+  } else {
+    res.redirect('/')
   }
 })
 

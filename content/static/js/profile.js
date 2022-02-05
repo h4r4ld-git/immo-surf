@@ -65,3 +65,26 @@ $(document).ready(() => {
     }
   })
 })
+
+$(document).ready(() => {
+  $('#addAff').click(() => {
+    $('#affChoice').slideToggle(100);
+  })
+  $('#affChoice .modal-close').click(() => {
+    $('#affChoice').slideToggle(100);
+  })
+  $('.delete').click(() => {
+    $("#newSubAff").slideToggle()
+  })
+})
+
+$(document).ready(() => {
+  $('button[id^="addUserAff"]').each(function(){
+    $(this).on('click', function(){
+      const sub = $(this).attr('id').split("addUserAff")[1]
+      $("#newSubAffSubID").val(sub)
+      $('#affChoice').slideToggle();
+      $('#newSubAff').slideToggle();
+    })
+  })
+})
