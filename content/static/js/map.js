@@ -547,7 +547,7 @@ $(document).ready(() => {
         } else if (data === "NotFound"){
           logMessage = error("L'adresse email n'est pas enregistré dans la base")
         } else if (data === "BadPass"){
-          logMessage = error("Mot de passe incorrect")
+          logMessage = error("PIN incorrect")
         } else if (data === "Valid"){
           logMessage = success("Vous étes connecté")
           window.location.reload();

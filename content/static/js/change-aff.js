@@ -1,10 +1,10 @@
 $(document).ready(() => {
   $("button[id^='del']").each((e, es) => {
     $(es).click(() => {
-      const addr = $(es).attr("id").replace("del", "")
+      const id = $(es).attr("id").replace("del", "")
       if (confirm("Are you sure? / Vous étes sùr?")){
         $.post('/DeleteAff', {
-            "address" : addr,
+            "id" : id,
           }, (data) => {
             window.location.reload();
           }
@@ -14,13 +14,13 @@ $(document).ready(() => {
   })
   $("button[id^='edit']").each((e, es) => {
     $(es).click(() => {
-      const addr = $(es).attr("id").replace("edit", "")
+      const id = $(es).attr("id").replace("edit", "")
       if (confirm("Are you sure? / Vous étes sùr?")){
         $.post('/EditAff', {
-            "address" : addr,
-            "title" : $("[id='" + addr + "immob1']").val(),
-            "description": $("[id='" + addr + "descr15']").val(),
-            "prix" : $("[id='" + addr + "descr01']").val(),
+            "id" : id,
+            "title" : $("[id='" + id + "immob1']").val(),
+            "description": $("[id='" + id + "descr15']").val(),
+            "prix" : $("[id='" + id + "descr01']").val(),
           }, (data) => {
             window.location.reload();
           }
