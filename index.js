@@ -60,7 +60,7 @@ app.get('/', function(req, res) {
       prices = client.db("immo-surf").collection("prices")
       users.findOne({email: req.session.user.email, tel: req.session.user.tel}, function(err, result){
         if (result){
-          affiches.find({$or: [{mail: req.session.user.email, tel: req.session.user.tel}, {mails: req.session.user.email, tels: req.session.user.tel}, {userIDs: req.session.user.userID}]}).toArray(function(err, affs){
+          affiches.find({$or: [{mail: req.session.user.email, tel: req.session.user.tel}, {mails: req.session.user.email}, {userIDs: req.session.user.userID}]}).toArray(function(err, affs){
             if (affs){
               abonnement.findOne({userID: req.session.user.userID, status: "active"}, function(err, result1){
                 abonnement.find({userID: req.session.user.userID}).toArray(function(err, result2){
@@ -397,7 +397,8 @@ app.post('/EditAff', async (req, res) => {
   if (req.session.user){
     MongoClient.connect(dbURL, async function(err, client) {
       db = client.db("immo-surf").collection("affiches")
-      const result = await db.updateOne({_id: ObjectId(req.body.id), mail: req.session.user.email}, {$set: {title: req.body.title, description: req.body.description, prix: req.body.prix, address: req.body.addr}})
+      await db.updateOne({_id: ObjectId(req.body.id), mail: req.session.user.email, userIDs: {$ne: req.session.user.userID}}, {$push: {userIDs: req.session.user.userID}})
+      const result = await db.updateOne({_id: ObjectId(req.body.id), mail: req.session.user.email}, {$set: {title: req.body.title, description: req.body.description, prix: req.body.prix, address: req.body.addr, tel: req.body.tel}})
       res.send("Hi")
     })
   } else {
