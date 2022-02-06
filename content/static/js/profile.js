@@ -88,3 +88,35 @@ $(document).ready(() => {
     })
   })
 })
+
+$(document).ready(function(){
+  $('#editUser').click(function(){
+    $.post('/editProfile', {
+      name: $('#NewName').val(),
+      mail: $('#NewMail').val(),
+      tel: $('#NewTel').val()
+    }, (data) => {
+      if (data === "success"){
+        window.location.reload();
+      }
+    })
+  })
+})
+
+$(document).ready(function(){
+  $("#newUserAdd").click(function(){
+    $("input[id^=but]").each(function(){
+      if ($(this).is(".selected")){
+        $.post('/addUserToAff', {
+          mail: $("#newUserMail").val(),
+          tel: $("#newUserTel").val(),
+          affID: $(this).attr("id").split("but")[1]
+        }, (data) => {
+          if (data === "success"){
+            window.location.reload();
+          }
+        })
+      }
+    })
+  })
+})

@@ -60,7 +60,7 @@ app.get('/', function(req, res) {
       prices = client.db("immo-surf").collection("prices")
       users.findOne({email: req.session.user.email, tel: req.session.user.tel}, function(err, result){
         if (result){
-          affiches.find({$or: [{mail: req.session.user.email, tel: req.session.user.tel}, {userIDs: req.session.user.userID}]}).toArray(function(err, affs){
+          affiches.find({$or: [{mail: req.session.user.email, tel: req.session.user.tel}, {mails: req.session.user.email, tels: req.session.user.tel}, {userIDs: req.session.user.userID}]}).toArray(function(err, affs){
             if (affs){
               abonnement.findOne({userID: req.session.user.userID, status: "active"}, function(err, result1){
                 abonnement.find({userID: req.session.user.userID}).toArray(function(err, result2){
@@ -202,6 +202,9 @@ app.post('/checkout', async function(req, res){
     const affichesOID = new ObjectId();
     db.insertOne({
       _id: affichesOID,
+      userIDs: [],
+      mails: [],
+      tels: [],
       location: req.body.coord,
       address: req.body.addr,
       title: req.body.immob,
@@ -423,6 +426,8 @@ app.post('/newAffSub', async (req, res) => {
             if (result.affExpire == 5){
               await affiches.insertOne({
                 userIDs: [req.session.user.userID],
+                mails: [],
+                tels: [],
                 location: affLoc,
                 address: addr,
                 title: titre,
@@ -436,6 +441,8 @@ app.post('/newAffSub', async (req, res) => {
             } else {
               await affiches.insertOne({
                 userIDs: [req.session.user.userID],
+                mails: [],
+                tels: [],
                 location: affLoc,
                 address: addr,
                 title: titre,
@@ -459,6 +466,52 @@ app.post('/newAffSub', async (req, res) => {
     })
   } else {
     res.redirect('/')
+  }
+})
+
+app.post('/editProfile', async function(req, res) {
+  const name = validator.escape(req.body.name)
+  const mail = validator.escape(req.body.mail)
+  var tel = validator.escape(req.body.tel)
+
+  if (req.session.user && (name && mail && tel)){
+    tel = tel.replace(/\D/g, '');
+    if (validator.isEmail(mail) && /^\d+$/.test(tel)){
+      MongoClient.connect(dbURL, async function(err, client){
+        users = client.db("immo-surf").collection("users")
+        affiches = client.db("immo-surf").collection("affiches")
+        await users.updateOne({_id: ObjectId(req.session.user.userID)}, {$set: {name: name, email: mail, tel: tel}})
+        await affiches.update({mail: req.session.user.email, tel: req.session.user.tel, userIDs: {$ne: req.session.user.userID}}, {$push: {userIDs: req.session.user.userID}})
+        req.session.user.name = name
+        req.session.user.email = mail
+        req.session.user.tel = tel
+        res.send("success")
+      })
+    }
+  }
+})
+
+app.post('/addUserToAff', async function (req, res) {
+  const affID = validator.escape(req.body.affID)
+  const mail = validator.escape(req.body.mail)
+  var tel = validator.escape(req.body.tel)
+
+  if (req.session.user && mail && tel && affID){
+    tel = tel.replace(/\D/g, '');
+    if (validator.isEmail(mail) && /^\d+$/.test(tel)){
+      MongoClient.connect(dbURL, async function(err, client){
+        users = client.db("immo-surf").collection("users")
+        affiches = client.db("immo-surf").collection("affiches")
+        await users.findOne({email: mail, tel: tel}, async (err, result) => {
+          if (result){
+            await affiches.updateOne({_id: ObjectId(affID)}, {$push: {userIDs: result._id.toString()}})
+          } else {
+            await affiches.updateOne({_id: ObjectId(affID)}, {$push: {mails: mail, tels: tel}})
+          }
+          res.send("success")
+        })
+      })
+    }
   }
 })
 
