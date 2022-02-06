@@ -38,7 +38,7 @@ function profileInit(){
         })
         $("#" + event.srcElement.id).addClass("selected");
         var source = event.target || event.srcElement;
-        $("[id='aff" + source.name + "']").toggle(100)
+        $("[id='aff" + event.srcElement.id.split("but")[1] + "']").toggle(100)
       }
     })
 

@@ -142,136 +142,50 @@ function activate(){
     $("#popup").slideToggle(500);
 }
 
-let autocomplete;
-let autocomplete1;
-let autocomplete2;
-let addressField;
-let address1Field;
-let address2Field;
-let postalField;
-
 function initAutocomplete() {
   $(document).ready(function() {
-    address1Field = document.querySelector("#addr");
-    address2Field = document.querySelector("#addr1");
-    addressField = document.querySelector("#addrSub");
-    // Create the autocomplete object, restricting the search predictions to
-    // addresses in the US and Canada.
-    autocomplete = new google.maps.places.Autocomplete(address1Field);
-    autocomplete1 = new google.maps.places.Autocomplete(address2Field);
-    autocomplete2 = new google.maps.places.Autocomplete(addressField);
-    address1Field.focus();
-    address2Field.focus();
-    addressField.focus();
-    // When the user selects an address from the drop-down, populate the
-    // address fields in the form.
-    autocomplete.addListener("place_changed", fillInAddress);
-    autocomplete1.addListener("place_changed", fillInAddress1);
-    autocomplete2.addListener("place_changed", fillInAddress2);
+    var inputs = document.querySelectorAll('input[id*=addr]');
+
+    var autocompletes = [];
+
+    for (var i = 0; i < inputs.length; i++) {
+        var autocomplete = new google.maps.places.Autocomplete(inputs[i]);
+        autocomplete.inputId = inputs[i].id;
+        autocomplete.addListener('place_changed', fillIn);
+        autocompletes.push(autocomplete);
+    }
   })
 }
 
-function fillInAddress() {
-  // Get the place details from the autocomplete object.
-  const place = autocomplete.getPlace();
-  let address1 = "";
+function fillIn() {
+    var place = this.getPlace();
+    var myInput = $('#' + this.inputId);
+    let address1 = "";
 
-  // Get each component of the address from the place details,
-  // and then fill-in the corresponding field on the form.
-  // place.address_components are google.maps.GeocoderAddressComponent objects
-  // which are documented at http://goo.gle/3l5i5Mr
-  for (const component of place.address_components) {
-    const componentType = component.types[0];
-    switch (componentType) {
-      case "street_number": {
-        address1 = `${address1} ${component.long_name}`;
-        break;
-      }
+    // Get each component of the address from the place details,
+    // and then fill-in the corresponding field on the form.
+    // place.address_components are google.maps.GeocoderAddressComponent objects
+    // which are documented at http://goo.gle/3l5i5Mr
+    for (const component of place.address_components) {
+      const componentType = component.types[0];
+      switch (componentType) {
+        case "street_number": {
+          address1 = `${address1} ${component.long_name}`;
+          break;
+        }
 
-      case "route": {
-        address1 = `${component.long_name} ${address1}`;
-        break;
-      }
+        case "route": {
+          address1 = `${component.long_name} ${address1}`;
+          break;
+        }
 
-      case "locality": {
-        address1 = `${address1}, ${component.long_name}`;
-        break;
-      }
-    }
-  }
-  address1Field.value = address1;
-  // After filling the form with address components from the Autocomplete
-  // prediction, set cursor focus on the second address line to encourage
-  // entry of subpremise information such as apartment, unit, or floor number.
-}
-
-function fillInAddress1() {
-  // Get the place details from the autocomplete object.
-  const place = autocomplete1.getPlace();
-  let address1 = "";
-
-  // Get each component of the address from the place details,
-  // and then fill-in the corresponding field on the form.
-  // place.address_components are google.maps.GeocoderAddressComponent objects
-  // which are documented at http://goo.gle/3l5i5Mr
-  for (const component of place.address_components) {
-    const componentType = component.types[0];
-    switch (componentType) {
-      case "locality": {
-        address1 = `${address1} ${component.long_name}`;
-        break;
-      }
-      case "administrative_area_level_1": {
-        address1 = `${address1} ${component.long_name}`;
-      }
-      case "country": {
-        address1 = `${address1} ${component.long_name}`;
+        case "locality": {
+          address1 = `${address1}, ${component.long_name}`;
+          break;
+        }
       }
     }
-  }
-  address2Field.value = address1;
-  // After filling the form with address components from the Autocomplete
-  // prediction, set cursor focus on the second address line to encourage
-  // entry of subpremise information such as apartment, unit, or floor number.
-}
-
-function fillInAddress2() {
-  // Get the place details from the autocomplete object.
-  const place = autocomplete2.getPlace();
-  let address1 = "";
-
-  // Get each component of the address from the place details,
-  // and then fill-in the corresponding field on the form.
-  // place.address_components are google.maps.GeocoderAddressComponent objects
-  // which are documented at http://goo.gle/3l5i5Mr
-  for (const component of place.address_components) {
-    const componentType = component.types[0];
-    switch (componentType) {
-      case "street_number": {
-        address1 = `${address1} ${component.long_name}`;
-        break;
-      }
-
-      case "route": {
-        address1 = `${component.long_name} ${address1}`;
-        break;
-      }
-
-      case "locality": {
-        address1 = `${address1}, ${component.long_name}`;
-        break;
-      }
-    }
-  }
-  console.log("hi")
-  addressField.value = address1;
-  var coord = $.get('https://nominatim.openstreetmap.org/search?format=json&q='+address1, function(data) {
-    $('#affLoc').val(data[0]["lat"] + "," + data[0]["lon"])
-  })
-
-  // After filling the form with address components from the Autocomplete
-  // prediction, set cursor focus on the second address line to encourage
-  // entry of subpremise information such as apartment, unit, or floor number.
+    myInput.val(address1)
 }
 
 $(function() {

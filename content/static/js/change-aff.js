@@ -21,6 +21,7 @@ $(document).ready(() => {
             "title" : $("[id='" + id + "immob1']").val(),
             "description": $("[id='" + id + "descr15']").val(),
             "prix" : $("[id='" + id + "descr01']").val(),
+            "addr" : $("[id='" + id + "addrChange']").val(),
           }, (data) => {
             window.location.reload();
           }

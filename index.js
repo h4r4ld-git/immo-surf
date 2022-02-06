@@ -7,7 +7,7 @@ const https = require('https');
 const fs = require('fs');
 const dotenv = require('dotenv');
 const validator = require('validator')
-const pinSender = require('./lib/MailSender')
+const mailer = require('./lib/MailSender')
 const makeId = require('./lib/makeId')
 const surfConsent = require('./lib/surfConsent')
 const profilePage = require('./lib/SurfRender').profile
@@ -79,7 +79,7 @@ app.get('/', function(req, res) {
 app.post('/getAffs', function(req, res) {
   MongoClient.connect(dbURL, function(err, client) {
     db = client.db("immo-surf").collection("affiches")
-    db.find().toArray(function(err, result) {
+    db.find({address: {$ne: "Nouveau"}}).toArray(function(err, result) {
       res.send(result)
     })
   })
@@ -104,7 +104,7 @@ app.post('/register', function(req, res) {
           } else if (!/^\d+$/.test(tel)){
             res.send("Phone")
           } else {
-            const id = pinSender.send(email);
+            const id = mailer.send(email);
             const userId = new ObjectId();
             db.insertOne({"_id": userId, "name": "Surfer", "email": email, "tel": tel, "pin": id});
             db = client.db("immo-surf").collection("abonnement")
@@ -167,7 +167,7 @@ app.post('/validPin', function(req, res) {
           res.send("NotFound")
         } else {
           const uri = makeId.makeid(20)
-          const id = pinSender.sendUrl(email, uri)
+          const id = mailer.sendUrl(email, uri)
           client.db("immo-surf").collection("valid").insertOne({"createdAt": new Date(), "id" : uri, "email" : email, "npin" : id})
           res.send("sent");
         }
@@ -397,7 +397,7 @@ app.post('/EditAff', async (req, res) => {
   if (req.session.user){
     MongoClient.connect(dbURL, async function(err, client) {
       db = client.db("immo-surf").collection("affiches")
-      const result = await db.updateOne({_id: ObjectId(req.body.id), mail: req.session.user.email}, {$set: {title: req.body.title, description: req.body.description, prix: req.body.prix}})
+      const result = await db.updateOne({_id: ObjectId(req.body.id), mail: req.session.user.email}, {$set: {title: req.body.title, description: req.body.description, prix: req.body.prix, address: req.body.addr}})
       res.send("Hi")
     })
   } else {
@@ -406,7 +406,10 @@ app.post('/EditAff', async (req, res) => {
 })
 
 app.post('/newAffSub', async (req, res) => {
-  const addr = validator.escape(req.body.addr)
+  var addr = validator.escape(req.body.addr)
+  if (!addr){
+    addr = "Nouveau"
+  }
   const mail = validator.escape(req.body.mail)
   const tel = validator.escape(req.body.tel)
   const prix = validator.escape(req.body.prix)
@@ -508,6 +511,7 @@ app.post('/addUserToAff', async function (req, res) {
           } else {
             await affiches.updateOne({_id: ObjectId(affID)}, {$push: {mails: mail, tels: tel}})
           }
+          mailer.sendAffInfo(mail, req.session.user.name)
           res.send("success")
         })
       })
